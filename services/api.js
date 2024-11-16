@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://your-api-url.com'; // Замените на ваш URL
+const API_URL = 'http://192.168.56.1:8000/api/';  // где 192.168.x.x - это IP вашего ПК
 
 export const fetchRequests = async () => {
     try {
@@ -15,7 +15,7 @@ export const fetchRequests = async () => {
 export const createRequest = async (requestData) => {
     try {
         const response = await axios.post(`${API_URL}/requests`, requestData);
-        return response.data;z
+        return response.data;
     } catch (error) {
         console.error('Ошибка при создании заявки:', error);
         throw error;

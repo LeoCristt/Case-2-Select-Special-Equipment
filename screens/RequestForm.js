@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Keyboard } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text';
+import { createRequest } from '../services/api';
 
 const RequestForm = ({ navigation }) => {
     const [requestData, setRequestData] = useState({
@@ -11,7 +12,7 @@ const RequestForm = ({ navigation }) => {
         distance: '',
         master: '',
     });
-    const [newTimeSlot, setNewTimeSlot] = useState('');
+    const [newDateSlot, setNewTimeSlot] = useState('');
     const [timeSlots, setTimeSlots] = useState([]);
 
     const handleInputChange = (name, value) => {
@@ -19,16 +20,19 @@ const RequestForm = ({ navigation }) => {
     };
 
     const addTimeSlot = () => {
-        if (newTimeSlot) {
+        if (newDateSlot) {
             const { type, quantity } = requestData;
-            setTimeSlots((prevSlots) => [...prevSlots, { time: newTimeSlot, type, quantity }]);
+            setTimeSlots((prevSlots) => [...prevSlots, { date: newDateSlot, type, quantity }]);
             setNewTimeSlot('');
         }
     };
 
     const handleSubmit = async () => {
         try {
-            await createRequest({ ...requestData, timeSlots });
+            const formattedDate = newDateSlot + ":00";  // Добавляем секунды (00)
+
+            // Отправляем запрос с преобразованным временем
+            await createRequest({ ...requestData, date: formattedDate });
             navigation.navigate('RequestList'); 
         } catch (error) {
             console.error('Ошибка при отправке заявки:', error);
@@ -84,12 +88,12 @@ const RequestForm = ({ navigation }) => {
                     <TextInputMask
                         type={'datetime'}
                         options={{
-                            format: 'HH:mm',
+                            format: 'YYYY-MM-DD HH:MM:SS',  // Маска для даты (день, месяц) и времени (часы, минуты)
                         }}
                         style={styles.input}
-                        value={newTimeSlot}
+                        value={newDateSlot}
                         onChangeText={setNewTimeSlot}
-                        placeholder="Введите время (HH:mm)"
+                        placeholder="Введите дату и время (ГГГГ-ММ-ДД ЧЧ:ММ)"
                     />
                     <TouchableOpacity style={styles.addButton} onPress={addTimeSlot}>
                         <Text style={styles.addButtonText}>Добавить время</Text>
