@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, Button, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
 const RequestList = ({ navigation }) => {
+    // ЭТА ЗАГЛУШКА ЧТОБЫ Я МОГ ДИЗАЙН СМОТРЕТЬ
     const [requests, setRequests] = useState([
         { id: 1, type: 'Экскаватор', quantity: 2, time: '10:00' },
         { id: 2, type: 'Бульдозер', quantity: 1, time: '11:00' },
@@ -13,7 +14,7 @@ const RequestList = ({ navigation }) => {
         if (newRequest.type && newRequest.quantity && newRequest.time) {
             const newId = requests.length ? requests[requests.length - 1].id + 1 : 1;
             setRequests([...requests, { id: newId, ...newRequest }]);
-            setNewRequest({ type: '', quantity: '', time: '' }); // Сбросить поля ввода
+            setNewRequest({ type: '', quantity: '', time: '' }); 
         }
     };
 
