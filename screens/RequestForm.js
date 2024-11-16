@@ -12,27 +12,35 @@ const RequestForm = ({ navigation }) => {
         distance: '',
         master: '',
     });
-    const [newDateSlot, setNewTimeSlot] = useState('');
-    const [timeSlots, setTimeSlots] = useState([]);
+    const [newDateSlot, setNewDateSlot] = useState('');
+    const [dateSlots, setDateSlots] = useState([]);
 
     const handleInputChange = (name, value) => {
         setRequestData({ ...requestData, [name]: value });
     };
 
-    const addTimeSlot = () => {
+    const addDateSlot = () => {
         if (newDateSlot) {
-            const { type, quantity } = requestData;
-            setTimeSlots((prevSlots) => [...prevSlots, { date: newDateSlot, type, quantity }]);
-            setNewTimeSlot('');
+            const { type, quantity, plannedWorkTime } = requestData;
+            setDateSlots((prevSlots) => [...prevSlots, { date: newDateSlot, type, quantity, plannedWorkTime }]);
+            setNewDateSlot('');
         }
     };
 
     const handleSubmit = async () => {
         try {
-            const formattedDate = newDateSlot + ":00";  // Добавляем секунды (00)
+            const formattedDateSlots = dateSlots.map(slot => ({
+                type: slot.type,
+                quantity: slot.quantity,
+                plannedWorkTime: slot.plannedWorkTime,
+                date: slot.date + ":00",  // Добавляем секунды
+            }));
+
+            // Деструктурируем requestData, чтобы исключить type, quantity, plannedWorkTime
+            const { type, quantity, plannedWorkTime, ...remainingRequestData } = requestData;
 
             // Отправляем запрос с преобразованным временем
-            await createRequest({ ...requestData, date: formattedDate });
+            await createRequest({ ...remainingRequestData, date_type_quantity_plannedWorkTime: formattedDateSlots });
             navigation.navigate('RequestList'); 
         } catch (error) {
             console.error('Ошибка при отправке заявки:', error);
@@ -55,11 +63,11 @@ const RequestForm = ({ navigation }) => {
                     />
                 </View>
             );
-        } else if (item.type === 'timeSlot') {
+        } else if (item.type === 'dateSlot') {
             return (
-                <View style={styles.timeSlot}>
-                    <Text>{item.time}</Text>
-                    <Text style={styles.infoText}>Тип: {item.type}, Количество: {item.quantity}</Text>
+                <View style={styles.dateSlot}>
+                    <Text>{item.date}</Text>
+                    <Text style={styles.infoText}>Тип: {item.type}, Количество: {item.quantity}, </Text>
                 </View>
             );
         }
@@ -70,7 +78,7 @@ const RequestForm = ({ navigation }) => {
         { type: 'input', label: 'Подразделение', name: 'subdivision' },
         { type: 'input', label: 'Тип техники', name: 'type' },
         { type: 'input', label: 'Количество', name: 'quantity', keyboardType: 'numeric' },
-        { type: 'input', label: 'Плановое время работы', name: 'plannedWorkTime', placeholder: 'Введите плановое время работы' },
+        { type: 'input', label: 'Плановое время работы', name: 'plannedWorkTime', placeholder: 'Введите плановое время работы', keyboardType: 'numeric' },
         { type: 'input', label: 'Расстояние до объекта (км)', name: 'distance', keyboardType: 'numeric' },
         { type: 'input', label: 'Мастер, подавший заявку', name: 'master' },
     ];
@@ -92,19 +100,19 @@ const RequestForm = ({ navigation }) => {
                         }}
                         style={styles.input}
                         value={newDateSlot}
-                        onChangeText={setNewTimeSlot}
+                        onChangeText={setNewDateSlot}
                         placeholder="Введите дату и время (ГГГГ-ММ-ДД ЧЧ:ММ)"
                     />
-                    <TouchableOpacity style={styles.addButton} onPress={addTimeSlot}>
+                    <TouchableOpacity style={styles.addButton} onPress={addDateSlot}>
                         <Text style={styles.addButtonText}>Добавить время</Text>
                     </TouchableOpacity>
                 </View>
                 <FlatList
-                    data={timeSlots}
+                    data={dateSlots}
                     renderItem={({ item }) => (
-                        <View style={styles.timeSlot}>
-                            <Text>{item.time}</Text>
-                            <Text style={styles.infoText}>Тип: {item.type}, Количество: {item.quantity}</Text>
+                        <View style={styles.dateSlot}>
+                            <Text>Время подачи: {item.date}</Text>
+                            <Text style={styles.infoText}>Тип техники: {item.type}, Количество: {item.quantity}, Плановое время работы: {item.plannedWorkTime}</Text>
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
@@ -145,11 +153,11 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
-    timeSlot: {
+    dateSlot: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
     },

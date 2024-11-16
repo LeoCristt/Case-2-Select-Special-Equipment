@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Button, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { fetchRequests } from '../services/api'; // Предположим, что fetchRequests импортируется из api
 
 const RequestList = ({ navigation }) => {
-    // ЭТА ЗАГЛУШКА ЧТОБЫ Я МОГ ДИЗАЙН СМОТРЕТЬ
-    const [requests, setRequests] = useState([
-        { id: 1, type: 'Экскаватор', quantity: 2, time: '10:00' },
-        { id: 2, type: 'Бульдозер', quantity: 1, time: '11:00' },
-        { id: 3, type: 'Гусеничный кран', quantity: 3, time: '12:00' },
-    ]);
-    const [newRequest, setNewRequest] = useState({ type: '', quantity: '', time: '' });
+    const [requests, setRequests] = useState([]); // Начальное состояние — пустой массив
 
-    const addRequest = () => {
-        if (newRequest.type && newRequest.quantity && newRequest.time) {
-            const newId = requests.length ? requests[requests.length - 1].id + 1 : 1;
-            setRequests([...requests, { id: newId, ...newRequest }]);
-            setNewRequest({ type: '', quantity: '', time: '' }); 
-        }
-    };
+    // Загружаем заявки из API при монтировании компонента
+    useEffect(() => {
+        const loadRequests = async () => {
+            try {
+                const fetchedRequests = await fetchRequests(); // Получаем данные с API
+                setRequests(fetchedRequests);  // Обновляем состояние с полученными заявками
+            } catch (error) {
+                console.error('Ошибка при загрузке заявок:', error);
+            }
+        };
+
+        loadRequests();  // Вызов функции загрузки
+    }, []);  // Пустой массив зависимостей, чтобы вызвать один раз при монтировании
 
     const navigateToDetail = (request) => {
         navigation.navigate('RequestDetail', { request });
@@ -28,9 +29,20 @@ const RequestList = ({ navigation }) => {
                 data={requests}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => navigateToDetail(item)} style={styles.requestItem}>
-                        <Text>Тип: {item.type}</Text>
-                        <Text>Количество: {item.quantity}</Text>
-                        <Text>Время: {item.time}</Text>
+                        <View style={styles.datesContainer}>
+                            <FlatList
+                                data={item.date_type_quantity_plannedWorkTime}
+                                renderItem={({ item: dateItem }) => (
+                                    <View style={styles.dateItem}>
+                                        <Text>Тип техники: {dateItem.type}</Text>
+                                        <Text>Количество: {dateItem.quantity}</Text>
+                                        <Text>Плановое время работы: {dateItem.plannedWorkTime}</Text>
+                                        <Text>Время подачи: {dateItem.date}</Text>
+                                    </View>
+                                )}
+                                keyExtractor={(dateItem, index) => index.toString()} // Используем индекс как ключ
+                            />
+                        </View>
                     </TouchableOpacity>
                 )}
                 keyExtractor={(item) => item.id.toString()}
@@ -49,13 +61,6 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        marginBottom: 10,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
         marginBottom: 10,
     },
 });
