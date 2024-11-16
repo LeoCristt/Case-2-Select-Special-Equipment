@@ -4,7 +4,7 @@ from rest_framework import status
 from .models import Request
 from .serializers import RequestSerializer
 
-class Request(APIView):
+class RequestList(APIView):
     def get(self, request):
         requests = Request.objects.all()
         serializer = RequestSerializer(requests, many=True)
