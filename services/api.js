@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://192.168.0.28:8000/api';  // где 192.168.x.x - это IP вашего ПК
+const API_URL = process.env.API_URL; 
 
 export const fetchRequests = async () => {
     try {
