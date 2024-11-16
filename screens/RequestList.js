@@ -1,45 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
-import { fetchRequests } from '../services/api';
+import React, { useState } from 'react';
+import { View, Text, FlatList, Button, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
-const RequestList = () => {
-    const [requests, setRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
+const RequestList = ({ navigation }) => {
+    const [requests, setRequests] = useState([
+        { id: 1, type: 'Экскаватор', quantity: 2, time: '10:00' },
+        { id: 2, type: 'Бульдозер', quantity: 1, time: '11:00' },
+        { id: 3, type: 'Гусеничный кран', quantity: 3, time: '12:00' },
+    ]);
+    const [newRequest, setNewRequest] = useState({ type: '', quantity: '', time: '' });
 
-    useEffect(() => {
-        const loadRequests = async () => {
-            try {
-                const data = await fetchRequests();
-                setRequests(data);
-            } catch (error) {
-                console.error('Ошибка при загрузке заявок:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const addRequest = () => {
+        if (newRequest.type && newRequest.quantity && newRequest.time) {
+            const newId = requests.length ? requests[requests.length - 1].id + 1 : 1;
+            setRequests([...requests, { id: newId, ...newRequest }]);
+            setNewRequest({ type: '', quantity: '', time: '' }); // Сбросить поля ввода
+        }
+    };
 
-        loadRequests();
-    }, []);
-
-    if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
-    }
+    const navigateToDetail = (request) => {
+        navigation.navigate('RequestDetail', { request });
+    };
 
     return (
-        <View>
+        <View style={styles.container}>
             <FlatList
                 data={requests}
                 renderItem={({ item }) => (
-                    <View>
-                        <Text>{item.type}</Text>
-                        <Text>{item.quantity}</Text>
-                        <Text>{item.time}</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => navigateToDetail(item)} style={styles.requestItem}>
+                        <Text>Тип: {item.type}</Text>
+                        <Text>Количество: {item.quantity}</Text>
+                        <Text>Время: {item.time}</Text>
+                    </TouchableOpacity>
                 )}
                 keyExtractor={(item) => item.id.toString()}
             />
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        padding: 20,
+        backgroundColor: '#f8f8f8',
+        flex: 1,
+    },
+    requestItem: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        marginBottom: 10,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+    },
+});
 
 export default RequestList;
