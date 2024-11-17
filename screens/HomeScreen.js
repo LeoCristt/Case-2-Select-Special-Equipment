@@ -13,6 +13,10 @@ const HomeScreen = ({ navigation }) => {
                 title="Посмотреть заявки"
                 onPress={() => navigation.navigate('RequestList')}
             />
+            <Button
+                title="Рабочий стол"
+                onPress={() => navigation.navigate('Dashboard')}
+            />
         </View>
     );
 };

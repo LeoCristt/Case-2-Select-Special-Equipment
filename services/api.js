@@ -1,6 +1,9 @@
 import axios from 'axios';
+import dotenv from 'dotenv';
 
-const API_URL = process.env.API_URL; 
+dotenv.config({ path: '../.env' })
+
+const API_URL = process.env.API_URL;
 
 export const fetchRequests = async () => {
     try {

@@ -16,15 +16,20 @@ const RequestDetail = ({ route, navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Тип техники: {request.type}</Text>
-            <Text style={styles.label}>Количество: {request.quantity}</Text>
-            <Text style={styles.label}>Время: {request.time}</Text>
-
             <TextInput
                 style={styles.input}
                 placeholder="Добавить технику"
                 value={newEquipment}
                 onChangeText={setNewEquipment}
             />
+            <Text style={styles.label}>Количество: {request.quantity}</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Количество"
+                value={newEquipment}
+                onChangeText={setNewEquipment}
+            />
+            <Text style={styles.label}>Время: {request.time}</Text>
             <Button title="Добавить" onPress={addEquipment} />
         </View>
     );
