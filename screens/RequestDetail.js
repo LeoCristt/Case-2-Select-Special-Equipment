@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { patchRequest } from '../services/api';
+import { TextInputMask } from 'react-native-masked-text';
 
 const RequestDetail = ({ route, navigation }) => {
     const { request } = route.params; // Получаем переданную заявку
-    const [newEquipment, setNewEquipment] = useState('');
+    const [[type, quantity, plannedWorkTime, date], setNewEquipment] = useState('');
 
     const addEquipment = () => {
-        if (newEquipment) {
+        if ([type, quantity, plannedWorkTime, date]) {
             // Логика добавления техники (например, отправка на сервер или обновление состояния)
+            patchRequest({id: request.id, date: date, type: type, quantity: quantity, plannedWorkTime: plannedWorkTime})
             console.log(`Добавлено новое оборудование: ${newEquipment}`);
             setNewEquipment(''); // Сбросить поле ввода
         }
@@ -15,16 +18,29 @@ const RequestDetail = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Тип техники: {request.type}</Text>
-            <Text style={styles.label}>Количество: {request.quantity}</Text>
-            <Text style={styles.label}>Время: {request.time}</Text>
-
+            <Text style={styles.label}>Тип техники:</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Добавить технику"
-                value={newEquipment}
-                onChangeText={setNewEquipment}
+                value={type}
             />
+            <Text style={styles.label}>Количество:</Text>
+            <TextInput
+                style={styles.input}
+                keyboardType= {'numeric'}
+                value={quantity}
+            />
+            <Text style={styles.label}>Плановое время работы:</Text>
+            <TextInput
+                style={styles.input}
+                keyboardType= {'numeric'}
+                value={plannedWorkTime}
+            />
+            <Text style={styles.label}>Время подачи:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={date}
+                    placeholder="Введите дату и время (ГГГГ-ММ-ДД ЧЧ:ММ)"
+                />
             <Button title="Добавить" onPress={addEquipment} />
         </View>
     );
