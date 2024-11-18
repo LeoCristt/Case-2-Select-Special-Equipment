@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
-import { fetchRequests, sendRequest } from '../services/api'; // Предположим, что sendRequest импортируется из api
+import { fetchRequests, sendRequests } from '../services/api'; // Предположим, что sendRequests импортируется из api
 
 const RequestList = ({ navigation }) => {
     const [requests, setRequests] = useState([]);
@@ -22,16 +22,19 @@ const RequestList = ({ navigation }) => {
         navigation.navigate('RequestDetail', { request });
     };
 
-    const handleSendRequest = async (requestId) => {
+    const navigateToEdit = (request) => {
+        navigation.navigate('EditRequest', { request }); // Переход на экран редактирования с передачей данных заявки
+    };
+
+    const handleSendRequests = async () => {
         try {
-            await sendRequest(requestId); // Отправляем заявку на сервер
-            setRequests(prevRequests => 
-                prevRequests.filter(request => request.id !== requestId) // Удаляем отправленную заявку из списка
-            );
-            Alert.alert('Успех', 'Заявка успешно отправлена!');
+            const requestIds = requests.map(request => request.id); // Получаем массив ID всех заявок
+            await sendRequests(requestIds); // Отправляем все заявки на сервер
+            setRequests([]); // Очищаем список заявок
+            Alert.alert('Успех', 'Все заявки успешно отправлены!');
         } catch (error) {
-            console.error('Ошибка при отправке заявки:', error);
-            Alert.alert('Ошибка', 'Не удалось отправить заявку.');
+            console.error('Ошибка при отправке заявок:', error);
+            Alert.alert('Ошибка', 'Не удалось отправить заявки.');
         }
     };
 
@@ -56,10 +59,12 @@ const RequestList = ({ navigation }) => {
                     />
                 </View>
             </TouchableOpacity>
-            <Button 
-                title="Отправить заявку" 
-                onPress={() => handleSendRequest(item.id)} 
-            />
+            <View style={styles.buttonContainer}>
+                <Button 
+                    title="Редактировать" 
+                    onPress={() => navigateToEdit(item)} 
+                />
+            </View>
         </View>
     );
 
@@ -70,6 +75,12 @@ const RequestList = ({ navigation }) => {
                 renderItem={renderRequestItem}
                 keyExtractor={(item) => item.id.toString()}
             />
+            {requests.length > 0 && (
+                <Button 
+                    title="Отправить заявки" 
+                    onPress={handleSendRequests} 
+                />
+            )}
         </View>
     );
 };
@@ -101,6 +112,11 @@ const styles = StyleSheet.create({
     },
     separator: {
         color: '#ccc',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
     },
 });
 

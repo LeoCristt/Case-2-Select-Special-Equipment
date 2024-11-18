@@ -6,6 +6,7 @@ import RequestForm from './screens/RequestForm'; // Импортируйте э�
 import RequestList from './screens/RequestList'; // Импортируйте экран списка заявок
 import RequestDetail from './screens/RequestDetail'; // Импортируйте экран деталей заявки
 import Dashboard from './screens/Dashboard'; 
+import EditRequest from './screens/EditRequest';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ const App = () => {
                 <Stack.Screen name="RequestList" component={RequestList} />
                 <Stack.Screen name="RequestDetail" component={RequestDetail} />
                 <Stack.Screen name="Dashboard" component={Dashboard} />
+                <Stack.Screen name="EditRequest" component={EditRequest} />
             </Stack.Navigator>
         </NavigationContainer>
     );
