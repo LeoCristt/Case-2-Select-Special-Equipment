@@ -1,5 +1,4 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
 
 const API_URL = "http://192.168.137.202:8000/api"; 
 

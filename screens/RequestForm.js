@@ -96,7 +96,7 @@ const RequestForm = ({ navigation }) => {
                     <TextInputMask
                         type={'datetime'}
                         options={{
-                            format: 'YYYY-MM-DD HH:MM:SS',  // Маска для даты (день, месяц) и времени (часы, минуты)
+                            format: 'YYYY-MM-DD HH:MM',  // Маска для даты (день, месяц) и времени (часы, минуты)
                         }}
                         style={styles.input}
                         value={newDateSlot}
