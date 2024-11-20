@@ -1,9 +1,6 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
 
-dotenv.config({ path: '../.env' })
-
-const API_URL = process.env.API_URL;
+const API_URL = "http://192.168.137.202:8000/api"; 
 
 export const fetchRequests = async () => {
     try {
@@ -21,6 +18,18 @@ export const createRequest = async (requestData) => {
         return response.data;
     } catch (error) {
         console.error('Ошибка при создании заявки:', error);
+        throw error;
+    }
+};
+
+export const patchRequest = async (requestData) => {
+    try {
+        const { id, ...remainingRequestData } = requestData;
+        console.log(requestData)
+        const response = await axios.patch(`${API_URL}/requests/${requestData.id}/`, remainingRequestData);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при изменении заявки:', error);
         throw error;
     }
 };

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { fetchRequests } from '../services/api'; // Предположим, что fetchRequests импортируется из api
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
+import { fetchRequests, sendRequests } from '../services/api'; // Предположим, что sendRequests импортируется из api
 
 const RequestList = ({ navigation }) => {
-    const [requests, setRequests] = useState([]); // Начальное состояние — пустой массив
+    const [requests, setRequests] = useState([]);
 
-    // Загружаем заявки из API при монтировании компонента
     useEffect(() => {
         const loadRequests = async () => {
             try {
@@ -16,8 +15,8 @@ const RequestList = ({ navigation }) => {
             }
         };
 
-        loadRequests();  // Вызов функции загрузки
-    }, []);  // Пустой массив зависимостей, чтобы вызвать один раз при монтировании
+        loadRequests();  
+    }, []);  
 
     const navigateToDetail = (request) => {
         navigation.navigate('RequestDetail', { request });
@@ -82,6 +81,12 @@ const RequestList = ({ navigation }) => {
                 renderItem={renderRequestItem}
                 keyExtractor={(item) => item.id.toString()}
             />
+            {requests.length > 0 && (
+                <Button 
+                    title="Отправить заявки" 
+                    onPress={handleSendRequests} 
+                />
+            )}
         </View>
     );
 };
