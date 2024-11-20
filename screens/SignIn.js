@@ -1,14 +1,32 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { login } from '../services/auth'; // Импорт вашей функции login
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignInScreen = ({ navigation }) => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSignIn = () => {
-        // Здесь вы можете добавить логику для входа
-        // Например, отправка данных на бэкенд
-        Alert.alert('Вход', `Email: ${email}, Пароль: ${password}`);
+    const handleSignIn = async () => {
+        setLoading(true);
+        try {
+            // Используем готовую функцию login
+            const tokens = await login(username, password);
+
+            // Сохраняем токены в хранилище
+            await AsyncStorage.setItem('accessToken', tokens.access);
+            await AsyncStorage.setItem('refreshToken', tokens.refresh);
+
+            // Переходим на следующий экран
+            Alert.alert('Успешный вход', 'Добро пожаловать!');
+            navigation.navigate('HomeScreen'); // Укажите ваш экран
+        } catch (error) {
+            console.error('Ошибка авторизации:', error);
+            Alert.alert('Ошибка', 'Неверный логин или пароль');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -16,10 +34,9 @@ const SignInScreen = ({ navigation }) => {
             <Text style={styles.title}>Вход в систему</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Электронная почта или Логин"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
+                placeholder="Логин"
+                value={username}
+                onChangeText={setUsername}
                 autoCapitalize="none"
             />
             <TextInput
@@ -29,7 +46,11 @@ const SignInScreen = ({ navigation }) => {
                 onChangeText={setPassword}
                 secureTextEntry
             />
-            <Button title="Войти" onPress={handleSignIn} />
+            {loading ? (
+                <ActivityIndicator size="large" color="#007BFF" />
+            ) : (
+                <Button title="Войти" onPress={handleSignIn} />
+            )}
         </View>
     );
 };
@@ -54,11 +75,6 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 15,
         backgroundColor: '#fff',
-    },
-    link: {
-        marginTop: 15,
-        color: '#007BFF',
-        textAlign: 'center',
     },
 });
 

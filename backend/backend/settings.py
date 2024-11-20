@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-bjk65h_m^5^r+p8=nhvh*^188&ntad7f8sr6ijds=9r-0^7h6c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.56.1', '192.168.0.28', 'localhost', '127.0.0.1', '0.0.0.0', '192.168.137.202']
+ALLOWED_HOSTS = ['192.168.56.1', '192.168.0.28', 'localhost', '127.0.0.1', '0.0.0.0', '192.168.137.202', '192.168.0.79']
 
 # Application definition
 
@@ -39,7 +39,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'corsheaders',
+    'rest_framework_simplejwt'
 ]
+
+AUTH_USER_MODEL = 'api.CustomUser'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Разрешает все домены (не рекомендуется для продакшн)
 
@@ -73,6 +76,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 
 # Database
