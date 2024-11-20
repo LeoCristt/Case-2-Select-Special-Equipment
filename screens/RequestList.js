@@ -48,8 +48,8 @@ const RequestList = ({ navigation }) => {
                         <View style={styles.dateItem}>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <Text>Тип техники: {dateItem.type}</Text>
-                            <Text>Количество: {dateItem.quantity}</Text>
-                            <Text>Плановое время работы: {dateItem.plannedWorkTime}</Text>
+                            <Text>Количество: {dateItem.quantity} шт.</Text>
+                            <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                         </View>
