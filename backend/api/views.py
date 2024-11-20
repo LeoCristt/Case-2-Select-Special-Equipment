@@ -15,28 +15,68 @@ class RequestList(APIView):
             subdivisionObj = Subdivision.objects.get(name=subdivision)
         except Subdivision.DoesNotExist:
             return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
+        
         requests = Request.objects.filter(subdivision=subdivisionObj)
-        serializer = RequestSerializer(requests, many=True)
-        return Response(serializer.data)
+
+        # Преобразуем данные для ответа
+        result = []
+        for request_obj in requests:
+            # Преобразуем объект модели в словарь
+            request_data = {
+                "id": request_obj.id,
+                "master": str(request_obj.master),  # Преобразуем мастера в строку
+                "distance": request_obj.distance,
+                "processed_by_logistician": request_obj.processed_by_logistician,
+                "date_type_quantity_plannedWorkTime": []
+            }
+
+            # Преобразуем date_type_quantity_plannedWorkTime
+            for entry in request_obj.date_type_quantity_plannedWorkTime:
+                type_id = entry.get("type")
+                if type_id:
+                    # Заменяем индекс type на его имя
+                    type_name = Type.objects.get(id=type_id).name
+                    entry["type"] = type_name
+                request_data["date_type_quantity_plannedWorkTime"].append(entry)
+
+            result.append(request_data)
+
+        return Response(result)
 
     def post(self, request):
         data = request.data.copy()
+
         try:
             subdivision = Subdivision.objects.get(name=request.data['subdivision'])
-            data['subdivision'] = subdivision.id  # Передаем ID объекта
         except Subdivision.DoesNotExist:
             return Response({"error": f"Subdivision with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        data['subdivision'] = subdivision.id  # Передаем ID объекта
+
+        master_data = request.data.get('master', '').split(" ")
+        
+        if len(master_data) != 3:
+            return Response({"error": "Invalid format for 'master'. Must include 'last_name', 'first_name', and 'patronymic'."}, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
-            master = Master.objects.get(last_name=request.data['master'].split(" ")[0], first_name=request.data['master'].split(" ")[1], patronymic=request.data['master'].split(" ")[2])
-            data['master'] = master.id
-        except Subdivision.DoesNotExist:
-            return Response({"error": f"Subdivision with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+            master = Master.objects.get(
+                last_name=master_data[0],
+                first_name=master_data[1],
+                patronymic=master_data[2]
+            )
+        except Master.DoesNotExist:
+            return Response({"error": f"Master with name '{request.data['master']}' does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        
+        data['master'] = master.id
+        
         try:
-            for i in range(0, len(request.data['date_type_quantity_plannedWorkTime']) + 1):
+            for i in range(0, len(request.data['date_type_quantity_plannedWorkTime'])):
                 type = Type.objects.get(name=request.data['date_type_quantity_plannedWorkTime'][i]['type'])
-                data['date_type_quantity_plannedWorkTime'][i]['type'] = type.id
         except Subdivision.DoesNotExist:
             return Response({"error": f"Type with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        data['date_type_quantity_plannedWorkTime'][i]['type'] = type.id
+
         serializer = RequestSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -53,13 +93,22 @@ class RequestList(APIView):
         # Получаем существующий JSON из поля date_type_quantity_plannedWorkTime
         existing_data = request_instance.date_type_quantity_plannedWorkTime or []
 
-        # Проверяем, что переданы данные для добавления
+        # Получаем данные из запроса
         new_data = request.data
-        print(new_data)
         if not new_data or not isinstance(new_data, dict):
-            return Response({"error": "Invalid data format. 'new_entry' must be a dictionary."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid data format. New entry must be a dictionary."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Добавляем новый словарь в массив
+        # Проверяем, что поле 'type' в новом словаре существует и заменяем его значение на ID
+        if "type" in new_data:
+            try:
+                type_instance = Type.objects.get(name=new_data["type"])
+                new_data["type"] = type_instance.id  # Заменяем имя типа на его ID
+            except Type.DoesNotExist:
+                return Response({"error": f"Type with name '{new_data['type']}' not found."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"error": "Field 'type' is required in the new entry."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Добавляем новый словарь в существующие данные
         existing_data.append(new_data)
 
         # Обновляем поле модели
@@ -67,6 +116,7 @@ class RequestList(APIView):
         request_instance.save()
 
         return Response({"success": "Entry added successfully", "updated_data": existing_data}, status=status.HTTP_200_OK)
+
     
     #def put (self, request, pk=None):
 

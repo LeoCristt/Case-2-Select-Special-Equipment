@@ -19,7 +19,7 @@ class Master(models.Model):
     patronymic = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.last_name + " " + self.first_name + " " + self.patronymic
 
 class Request(models.Model):
     subdivision = models.ForeignKey(Subdivision, on_delete=models.SET_NULL, null=True)
