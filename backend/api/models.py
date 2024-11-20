@@ -1,17 +1,33 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-class Request(models.Model):
-    subdivision = models.CharField(max_length=100)
-    distance = models.PositiveIntegerField()
-    master = models.CharField(max_length=100)
-    date_type_quantity_plannedWorkTime = models.JSONField()
-
 class Subdivision(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
+class Type(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    
+class Master(models.Model):
+    first_name = models.CharField(max_length=100, unique=True)
+    last_name = models.CharField(max_length=100, unique=True)
+    patronymic = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Request(models.Model):
+    subdivision = models.ForeignKey(Subdivision, on_delete=models.SET_NULL, null=True)
+    distance = models.PositiveIntegerField()
+    master = models.ForeignKey(Master, on_delete=models.SET_NULL, null=True)
+    date_type_quantity_plannedWorkTime = models.JSONField()
+    processed_by_logistician = models.BooleanField(default=False)
+
 
 class CustomUser(AbstractUser):
     # Добавляем поле для роли

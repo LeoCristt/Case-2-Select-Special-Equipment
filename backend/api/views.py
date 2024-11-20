@@ -5,18 +5,39 @@ from .models import Request
 from .serializers import RequestSerializer
 from rest_framework.exceptions import NotFound
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Subdivision, Type, Master
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class RequestList(APIView):
     def get(self, request, subdivision=None):
-        requests = Request.objects.filter(subdivision=subdivision)
+        try:
+            subdivisionObj = Subdivision.objects.get(name=subdivision)
+        except Subdivision.DoesNotExist:
+            return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
+        requests = Request.objects.filter(subdivision=subdivisionObj)
         serializer = RequestSerializer(requests, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = RequestSerializer(data=request.data)
+        data = request.data.copy()
+        try:
+            subdivision = Subdivision.objects.get(name=request.data['subdivision'])
+            data['subdivision'] = subdivision.id  # Передаем ID объекта
+        except Subdivision.DoesNotExist:
+            return Response({"error": f"Subdivision with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            master = Master.objects.get(last_name=request.data['master'].split(" ")[0], first_name=request.data['master'].split(" ")[1], patronymic=request.data['master'].split(" ")[2])
+            data['master'] = master.id
+        except Subdivision.DoesNotExist:
+            return Response({"error": f"Subdivision with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            for i in range(0, len(request.data['date_type_quantity_plannedWorkTime']) + 1):
+                type = Type.objects.get(name=request.data['date_type_quantity_plannedWorkTime'][i]['type'])
+                data['date_type_quantity_plannedWorkTime'][i]['type'] = type.id
+        except Subdivision.DoesNotExist:
+            return Response({"error": f"Type with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = RequestSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -46,6 +67,26 @@ class RequestList(APIView):
         request_instance.save()
 
         return Response({"success": "Entry added successfully", "updated_data": existing_data}, status=status.HTTP_200_OK)
+    
+    #def put (self, request, pk=None):
+
+class SubdivisionList(APIView):
+    def get(self, request):
+        requests = Subdivision.objects.all()
+        serializer = RequestSerializer(requests, many=True)
+        return Response(serializer.data)
+    
+class TypeList(APIView):
+    def get(self, request):
+        requests = Type.objects.all()
+        serializer = RequestSerializer(requests, many=True)
+        return Response(serializer.data)
+    
+class MasterList(APIView):
+    def get(self, request):
+        requests = Master.objects.all()
+        serializer = RequestSerializer(requests, many=True)
+        return Response(serializer.data)
 
 # Создаем новый сериализатор для получения токенов с дополнительными данными
 class CustomTokenObtainPairSerializer(serializers.Serializer):
