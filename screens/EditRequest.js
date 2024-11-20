@@ -27,7 +27,7 @@ const EditRequest = ({ route, navigation }) => {
     return (
         <KeyboardAvoidingView
             style={styles.container}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "android" ? "padding" : "height"}
             keyboardVerticalOffset={100} // Отступ для клавиатуры
         >
             <ScrollView contentContainerStyle={styles.scrollView}>

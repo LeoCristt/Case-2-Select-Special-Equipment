@@ -46,6 +46,7 @@ const SignInScreen = ({ navigation }) => {
                 onChangeText={setPassword}
                 secureTextEntry
             />
+
             {loading ? (
                 <ActivityIndicator size="large" color="#007BFF" />
             ) : (

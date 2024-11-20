@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()  
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,8 @@ SECRET_KEY = 'django-insecure-bjk65h_m^5^r+p8=nhvh*^188&ntad7f8sr6ijds=9r-0^7h6c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.56.1', '192.168.0.28', 'localhost', '127.0.0.1', '0.0.0.0', '192.168.137.202', '192.168.0.79']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+
 
 # Application definition
 
@@ -90,14 +95,13 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'database',   # Имя вашей базы данных
-        'USER': 'postgres',   # Ваше имя пользователя
-        'PASSWORD': '12345',  # Ваш пароль
-        'HOST': 'localhost',   # Если база данных на другом сервере, укажите IP-адрес
-        'PORT': '5432',  # Порт по умолчанию для PostgreSQL
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

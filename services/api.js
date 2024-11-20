@@ -1,6 +1,9 @@
 import apiClient from './apiClient'; // Подключаем настроенный axios
 
+const API_URL = "";
+
 export const fetchRequests = async (subdivision) => {
+
     try {
         const response = await apiClient.get(`/requests/${subdivision}/`);
         return response.data;
