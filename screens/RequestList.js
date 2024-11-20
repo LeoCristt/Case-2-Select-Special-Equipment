@@ -1,36 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
-import { fetchRequests, sendRequests } from '../services/api'; // Предположим, что sendRequests импортируется из api
+import { jwtDecode } from "jwt-decode"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchRequests, sendRequests } from '../services/api';
 
 const RequestList = ({ navigation }) => {
     const [requests, setRequests] = useState([]);
+    const [subdivision, setSubdivision] = useState('');
+
+    useEffect(() => {
+        const decodeJWT = async () => {
+            try {
+                const token = await getAuthToken();
+                console.log("Получен токен:", token);  // Проверка полученного токена
+                if (token) {
+                    const decoded = jwtDecode(token);
+                    console.log("Декодированный токен:", decoded);  // Проверка декодированного токена
+                    setSubdivision(decoded.subdivision);
+                } else {
+                    console.log("Токен не найден");
+                }
+            } catch (error) {
+                console.error('Ошибка при декодировании JWT:', error);
+            }
+        };
+        
+
+        decodeJWT();
+    }, []);
 
     useEffect(() => {
         const loadRequests = async () => {
             try {
-                const fetchedRequests = await fetchRequests(); // Получаем данные с API
-                setRequests(fetchedRequests);  // Обновляем состояние с полученными заявками
+                if (!subdivision) return;
+                const fetchedRequests = await fetchRequests(subdivision);
+                setRequests(fetchedRequests);
             } catch (error) {
                 console.error('Ошибка при загрузке заявок:', error);
             }
         };
 
-        loadRequests();  
-    }, []);  
+        loadRequests();
+    }, [subdivision]);
 
     const navigateToDetail = (request) => {
         navigation.navigate('RequestDetail', { request });
     };
 
     const navigateToEdit = (request) => {
-        navigation.navigate('EditRequest', { request }); // Переход на экран редактирования с передачей данных заявки
+        navigation.navigate('EditRequest', { request });
     };
 
     const handleSendRequests = async () => {
         try {
-            const requestIds = requests.map(request => request.id); // Получаем массив ID всех заявок
-            await sendRequests(requestIds); // Отправляем все заявки на сервер
-            setRequests([]); // Очищаем список заявок
+            const requestIds = requests.map(request => request.id);
+            await sendRequests(requestIds);
+            setRequests([]);
             Alert.alert('Успех', 'Все заявки успешно отправлены!');
         } catch (error) {
             console.error('Ошибка при отправке заявок:', error);
@@ -89,6 +114,16 @@ const RequestList = ({ navigation }) => {
             )}
         </View>
     );
+};
+
+const getAuthToken = async () => {
+    try {
+        const token = await AsyncStorage.getItem('accessToken');
+        return token;
+    } catch (error) {
+        console.error('Ошибка при получении токена из AsyncStorage:', error);
+        return null;
+    }
 };
 
 const styles = StyleSheet.create({

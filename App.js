@@ -18,7 +18,7 @@ const App = () => {
         <NavigationContainer>
             <Stack.Navigator initialRouteName="SignIn">
                 <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}/>
-                <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Главная' }}/>
+                <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ title: 'Главная' }}/>
                 <Stack.Screen name="RequestForm" component={RequestForm} options={{ title: 'Создание сводной заявки' }}/>
                 <Stack.Screen name="RequestList" component={RequestList} options={{ title: 'Список заявок' }}/>
                 <Stack.Screen name="RequestDetail" component={RequestDetail} options={{ title: 'Добавление техники' }}/>

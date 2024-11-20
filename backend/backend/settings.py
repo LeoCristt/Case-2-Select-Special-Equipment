@@ -31,6 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,7 +44,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'corsheaders',
+    'rest_framework_simplejwt'
 ]
+
+AUTH_USER_MODEL = 'api.CustomUser'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Разрешает все домены (не рекомендуется для продакшн)
 
@@ -77,6 +81,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 
 # Database
