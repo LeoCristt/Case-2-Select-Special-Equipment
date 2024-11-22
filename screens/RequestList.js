@@ -38,8 +38,9 @@ const RequestList = ({ navigation }) => {
         navigation.navigate('RequestDetail', { request });
     };
 
-    const navigateToEdit = (dateItem) => {
-        navigation.navigate('EditRequest', { dateItem }); 
+    const navigateToEdit = (dateItem, item) => {
+        const request_id = item.id;
+        navigation.navigate('EditRequest', { dateItem, request_id }); 
     };
 
     const handleSendRequests = async () => {
@@ -70,7 +71,7 @@ const RequestList = ({ navigation }) => {
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <TouchableOpacity
                                 style={styles.actionButton}
-                                onPress={() => navigateToEdit(dateItem)} // Передаем только dateItem
+                                onPress={() => navigateToEdit(dateItem, item)} // Передаем только dateItem
                             >
                                 <Text style={styles.buttonText}>Редактировать</Text>
                             </TouchableOpacity>

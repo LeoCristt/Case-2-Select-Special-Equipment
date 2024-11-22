@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 urlpatterns = [
     path('request/', RequestList.as_view(), name='request-list'),
     path('request/<int:pk>/', RequestList.as_view(), name='request-detail'),
+    path('request/<int:pk>/<int:list_index>/', RequestList.as_view(), name='request-edit'),
     path('request/<str:subdivision>/', RequestList.as_view(), name='request-subdivision'),
 
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Используем кастомный токен
