@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { patchRequest } from '../services/api';
 import { TextInputMask } from 'react-native-masked-text';
+import { useNavigation } from '@react-navigation/native'; // Импортируем useNavigation
 
 const RequestDetail = ({ route }) => {
+    const navigation = useNavigation(); // Получаем объект navigation
     const { request } = route.params; 
     const [type, setType] = useState('');
     const [quantity, setQuantity] = useState('');
@@ -18,6 +20,7 @@ const RequestDetail = ({ route }) => {
             setQuantity('');
             setPlannedWorkTime('');
             setDate('');
+            navigation.navigate('RequestList'); 
         }
     };
 

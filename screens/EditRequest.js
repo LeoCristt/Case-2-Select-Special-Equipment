@@ -1,89 +1,65 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { updateRequest } from '../services/api'; // Предположим, что updateRequest импортируется из api
 
 const EditRequest = ({ route, navigation }) => {
-    const { request } = route.params; // Получаем данные заявки из параметров маршрута
-    const [master, setMaster] = useState(request.master);
-    const [dateTypeQuantityPlannedWorkTime, setDateTypeQuantityPlannedWorkTime] = useState(request.date_type_quantity_plannedWorkTime);
+    const { dateItem } = route.params;
+
+    // Проверяем, что dateItem определен
+    if (!dateItem) {
+        console.error('dateItem не передан в EditRequest');
+        return (
+            <View style={styles.container}>
+                <Text style={styles.errorText}>Ошибка: Не удалось загрузить данные заявки.</Text>
+            </View>
+        );
+    }
+
+    const [type, setType] = useState(dateItem.type);
+    const [quantity, setQuantity] = useState(dateItem.quantity);
+    const [plannedWorkTime, setPlannedWorkTime] = useState(dateItem.plannedWorkTime);
+    const [date, setDate] = useState(dateItem.date);
 
     const handleSave = async () => {
-        try {
-            const updatedRequest = {
-                ...request,
-                master,
-                date_type_quantity_plannedWorkTime,
-            };
-
-            await updateRequest(updatedRequest); // Отправляем обновленные данные на сервер
-            Alert.alert('Успех', 'Заявка успешно обновлена!');
-            navigation.goBack(); // Возвращаемся на предыдущий экран
-        } catch (error) {
-            console.error('Ошибка при обновлении заявки:', error);
-            Alert.alert('Ошибка', 'Не удалось обновить заявку.');
-        }
+        // Логика сохранения...
     };
 
     return (
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === "android" ? "padding" : "height"}
-            keyboardVerticalOffset={100} // Отступ для клавиатуры
+            keyboardVerticalOffset={100}
         >
             <ScrollView contentContainerStyle={styles.scrollView}>
                 <Text style={styles.title}>Редактировать заявку</Text>
+                <Text style={styles.label}>Добавленные временные слоты:</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Имя мастера"
-                    value={master}
-                    onChangeText={setMaster}
+                    placeholder="Тип техники"
+                    value={type}
+                    onChangeText={setType}
                 />
-                {/* Здесь можно добавить дополнительные поля для редактирования */}
-                {dateTypeQuantityPlannedWorkTime.map((item, index) => (
-                    <View key={index} style={styles.dateItem}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Тип техники"
-                            value={item.type}
-                            onChangeText={(text) => {
-                                const newData = [...dateTypeQuantityPlannedWorkTime];
-                                newData[index].type = text;
-                                setDateTypeQuantityPlannedWorkTime(newData);
-                            }}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Количество"
-                            value={String(item.quantity)}
-                            keyboardType="numeric"
-                            onChangeText={(text) => {
-                                const newData = [...dateTypeQuantityPlannedWorkTime];
-                                newData[index].quantity = Number(text);
-                                setDateTypeQuantityPlannedWorkTime(newData);
-                            }}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Плановое время работы"
-                            value={item.plannedWorkTime}
-                            onChangeText={(text) => {
-                                const newData = [...dateTypeQuantityPlannedWorkTime];
-                                newData[index].plannedWorkTime = text;
-                                setDateTypeQuantityPlannedWorkTime(newData);
-                            }}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Время подачи"
-                            value={item.date}
-                            onChangeText={(text) => {
-                                const newData = [...dateTypeQuantityPlannedWorkTime];
-                                newData[index].date = text;
-                                setDateTypeQuantityPlannedWorkTime(newData);
-                            }}
-                        />
-                    </View>
-                ))}
+                <Text style={styles.label}>Количество:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Количество"
+                    value={String(quantity)}
+                    keyboardType="numeric"
+                    onChangeText={(text) => setQuantity(Number(text))}
+                />
+                <Text style={styles.label}>Плановое время работы:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Плановое время работы"
+                    value={plannedWorkTime}
+                    onChangeText={setPlannedWorkTime}
+                />
+                <Text style={styles.label}>Время подачи:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Время подачи"
+                    value={date}
+                    onChangeText={setDate}
+                />
                 <View style={styles.buttonContainer}>
                     <Button title="Сохранить изменения" onPress={handleSave} />
                 </View>
@@ -99,12 +75,16 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         padding: 20,
-        paddingBottom: 40, // Добавляем отступ внизу для кнопки
+        paddingBottom: 40,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 5,
     },
     input: {
         borderWidth: 1,
@@ -114,11 +94,13 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         backgroundColor: '#fff',
     },
-    dateItem: {
-        marginBottom: 20,
-    },
     buttonContainer: {
-        marginTop: 10, 
+        marginTop: 10,
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 20,
     },
 });
 

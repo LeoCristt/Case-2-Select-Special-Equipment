@@ -38,8 +38,8 @@ const RequestList = ({ navigation }) => {
         navigation.navigate('RequestDetail', { request });
     };
 
-    const navigateToEdit = (request) => {
-        navigation.navigate('EditRequest', { request });
+    const navigateToEdit = (dateItem) => {
+        navigation.navigate('EditRequest', { dateItem }); 
     };
 
     const handleSendRequests = async () => {
@@ -68,23 +68,23 @@ const RequestList = ({ navigation }) => {
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
+                            <TouchableOpacity
+                                style={styles.actionButton}
+                                onPress={() => navigateToEdit(dateItem)} // Передаем только dateItem
+                            >
+                                <Text style={styles.buttonText}>Редактировать</Text>
+                            </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(dateItem, index) => index.toString()} // Используем индекс как ключ
+                    keyExtractor={(dateItem, index) => index.toString()}
                 />
             </View>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                    style={styles.actionButton} 
+                <TouchableOpacity
+                    style={styles.actionButton}
                     onPress={() => navigateToDetail(item)}
                 >
                     <Text style={styles.buttonText}>Добавить</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={styles.actionButton} 
-                    onPress={() => navigateToEdit(item)} 
-                >
-                    <Text style={styles.buttonText}>Редактировать</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -98,9 +98,9 @@ const RequestList = ({ navigation }) => {
                 keyExtractor={(item) => item.id.toString()}
             />
             {requests.length > 0 && (
-                <Button 
-                    title="Отправить заявки" 
-                    onPress={handleSendRequests} 
+                <Button
+                    title="Отправить заявки"
+                    onPress={handleSendRequests}
                 />
             )}
         </View>

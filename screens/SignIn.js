@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { login } from '../services/auth'; // Импорт вашей функции login
+import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, ImageBackground } from 'react-native';
+import { login } from '../services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignInScreen = ({ navigation }) => {
@@ -11,16 +11,11 @@ const SignInScreen = ({ navigation }) => {
     const handleSignIn = async () => {
         setLoading(true);
         try {
-            // Используем готовую функцию login
             const tokens = await login(username, password);
-
-            // Сохраняем токены в хранилище
             await AsyncStorage.setItem('accessToken', tokens.access);
             await AsyncStorage.setItem('refreshToken', tokens.refresh);
-
-            // Переходим на следующий экран
-            Alert.alert('Успешный вход', 'Добро пожаловать!');
-            navigation.navigate('HomeScreen'); // Укажите ваш экран
+            Alert.alert('Успешный вход', 'Добро пожаловать на платформу управления спецтехникой!');
+            navigation.navigate('Main');
         } catch (error) {
             console.error('Ошибка авторизации:', error);
             Alert.alert('Ошибка', 'Неверный логин или пароль');
@@ -46,11 +41,10 @@ const SignInScreen = ({ navigation }) => {
                 onChangeText={setPassword}
                 secureTextEntry
             />
-
             {loading ? (
-                <ActivityIndicator size="large" color="#007BFF" />
+                <ActivityIndicator size="large" color="#FFC107" />
             ) : (
-                <Button title="Войти" onPress={handleSignIn} />
+                <Button title="Войти" onPress={handleSignIn} color="#FFC107" />
             )}
         </View>
     );
@@ -61,7 +55,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         padding: 20,
-        backgroundColor: '#f8f8f8',
     },
     title: {
         fontSize: 28,
