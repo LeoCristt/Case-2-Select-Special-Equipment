@@ -4,7 +4,6 @@ import { AuthContext } from '../services/AuthContext'; // Убедитесь, ч
 
 const HomeScreen = ({ navigation }) => {
     const { token, decodedToken } = useContext(AuthContext);
-    console.log(decodedToken.role)
 
     return (
         <View style={styles.container}>

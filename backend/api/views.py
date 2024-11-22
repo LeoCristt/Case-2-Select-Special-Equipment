@@ -174,11 +174,13 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         
         refresh['role'] = user.role 
         refresh['subdivision'] = user.subdivision.name
+        refresh['username'] = user.username
 
         # Генерируем AccessToken
         access_token = refresh.access_token
         access_token['role'] = user.role
-        access_token['subdivision'] = user.subdivision.name  # То же самое для access токена
+        access_token['subdivision'] = user.subdivision.name 
+        access_token['username'] = user.username
 
         # Формируем ответ с токенами
         return Response({
