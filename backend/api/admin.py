@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Subdivision
+from .models import CustomUser, Subdivision, Type, Master
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
@@ -12,3 +12,11 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(Subdivision)
 class SubdivisionAdmin(admin.ModelAdmin):
     list_display = ['name']
+
+@admin.register(Type)
+class TypeAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+@admin.register(Master)
+class MasterAdmin(admin.ModelAdmin):
+    list_display = ['first_name', 'last_name', 'patronymic']

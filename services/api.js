@@ -1,11 +1,9 @@
 import apiClient from './apiClient'; // Подключаем настроенный axios
 
-const API_URL = "";
-
 export const fetchRequests = async (subdivision) => {
 
     try {
-        const response = await apiClient.get(`/requests/${subdivision}/`);
+        const response = await apiClient.get(`/request/${subdivision}/`);
         return response.data;
     } catch (error) {
         console.error('Ошибка при получении заявок:', error);
@@ -15,7 +13,7 @@ export const fetchRequests = async (subdivision) => {
 
 export const createRequest = async (requestData) => {
     try {
-        const response = await apiClient.post(`/requests/`, requestData);
+        const response = await apiClient.post(`/request/`, requestData);
         return response.data;
     } catch (error) {
         console.error('Ошибка при создании заявки:', error);
@@ -27,7 +25,7 @@ export const patchRequest = async (requestData) => {
     try {
         const { id, ...remainingRequestData } = requestData;
         console.log(requestData)
-        const response = await apiClient.patch(`/requests/${requestData.id}/`, remainingRequestData);
+        const response = await apiClient.patch(`/request/${requestData.id}/`, remainingRequestData);
         return response.data;
     } catch (error) {
         console.error('Ошибка при изменении заявки:', error);
