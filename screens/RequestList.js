@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
-import { jwtDecode } from "jwt-decode";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchRequests, sendRequests } from '../services/api';
+import { AuthContext } from '../services/AuthContext'; // Убедитесь, что путь к AuthContext корректен
 
 const RequestList = ({ navigation }) => {
     const [requests, setRequests] = useState([]);
     const [subdivision, setSubdivision] = useState('');
+    const { token, decodedToken } = useContext(AuthContext);
 
     useEffect(() => {
         const decodeJWT = async () => {
-            try {
-                const token = await getAuthToken();
-                if (token) {
-                    const decoded = jwtDecode(token);
-                    setSubdivision(decoded.subdivision);
-                } else {
-                    console.log("Токен не найден");
-                }
-            } catch (error) {
-                console.error('Ошибка при декодировании JWT:', error);
+            if (decodedToken) {
+                setSubdivision(decodedToken.subdivision);
+            } else {
+                console.log("Токен не найден");
             }
         };
 
@@ -111,16 +105,6 @@ const RequestList = ({ navigation }) => {
             )}
         </View>
     );
-};
-
-const getAuthToken = async () => {
-    try {
-        const token = await AsyncStorage.getItem('accessToken');
-        return token;
-    } catch (error) {
-        console.error('Ошибка при получении токена из AsyncStorage:', error);
-        return null;
-    }
 };
 
 const styles = StyleSheet.create({

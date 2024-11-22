@@ -1,27 +1,35 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
+import { AuthContext } from '../services/AuthContext'; // Убедитесь, что путь к AuthContext корректен
 
 const HomeScreen = ({ navigation }) => {
+    const { token, decodedToken } = useContext(AuthContext);
+    console.log(decodedToken.role)
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Добро пожаловать в приложение!</Text>
-            <View style={styles.buttonContainer}>
+            {(decodedToken.role === "master" || decodedToken.role === "admin") && (
                 <Button
-                    title="Создать заявку"
-                    onPress={() => navigation.navigate('RequestForm')}
-                    color="#FFC107" // Цвет кнопки
+                title="Создать заявку"
+                onPress={() => navigation.navigate('RequestForm')}
+                color="#FFC107" // Цвет кнопки
                 />
+            )}
+            {(decodedToken.role === "logistician" || decodedToken.role === "admin") && (
                 <Button
-                    title="Посмотреть заявки"
-                    onPress={() => navigation.navigate('RequestList')}
-                    color="#FFC107" // Цвет кнопки
+                title="Посмотреть заявки"
+                onPress={() => navigation.navigate('RequestList')}
+                 color="#FFC107" // Цвет кнопки
                 />
+            )}
+            {(decodedToken.role === "dispatcher" || decodedToken.role === "admin") && (
                 <Button
-                    title="Рабочий стол"
-                    onPress={() => navigation.navigate('Dashboard')}
-                    color="#FFC107" // Цвет кнопки
+                title="Рабочий стол"
+                onPress={() => navigation.navigate('Dashboard')}
+                color="#FFC107" // Цвет кнопки
                 />
-            </View>
+            )}
         </View>
     );
 };
