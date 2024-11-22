@@ -13,10 +13,18 @@ class Type(models.Model):
     def __str__(self):
         return self.name
     
+class Object(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    
 class Master(models.Model):
     first_name = models.CharField(max_length=100, unique=True)
     last_name = models.CharField(max_length=100, unique=True)
     patronymic = models.CharField(max_length=100, unique=True)
+
+    object = models.ForeignKey(Object, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.last_name + " " + self.first_name + " " + self.patronymic
@@ -35,6 +43,7 @@ class CustomUser(AbstractUser):
         ('master', 'Мастер бригады'),
         ('logistician', 'Логист'),
         ('dispatcher', 'Центральный диспетчер'),
+        ('admin', 'Администратор'),
     )
     
     role = models.CharField(
