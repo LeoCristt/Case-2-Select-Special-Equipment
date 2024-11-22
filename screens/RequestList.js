@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchRequests, sendRequests } from '../services/api';
 
@@ -12,10 +12,8 @@ const RequestList = ({ navigation }) => {
         const decodeJWT = async () => {
             try {
                 const token = await getAuthToken();
-                console.log("Получен токен:", token);  // Проверка полученного токена
                 if (token) {
                     const decoded = jwtDecode(token);
-                    console.log("Декодированный токен:", decoded);  // Проверка декодированного токена
                     setSubdivision(decoded.subdivision);
                 } else {
                     console.log("Токен не найден");
@@ -24,7 +22,6 @@ const RequestList = ({ navigation }) => {
                 console.error('Ошибка при декодировании JWT:', error);
             }
         };
-        
 
         decodeJWT();
     }, []);
@@ -47,8 +44,8 @@ const RequestList = ({ navigation }) => {
         navigation.navigate('RequestDetail', { request });
     };
 
-    const navigateToEdit = (request) => {
-        navigation.navigate('EditRequest', { request });
+    const navigateToEdit = (dateItem) => {
+        navigation.navigate('EditRequest', { dateItem }); 
     };
 
     const handleSendRequests = async () => {
@@ -77,23 +74,23 @@ const RequestList = ({ navigation }) => {
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
+                            <TouchableOpacity
+                                style={styles.actionButton}
+                                onPress={() => navigateToEdit(dateItem)} // Передаем только dateItem
+                            >
+                                <Text style={styles.buttonText}>Редактировать</Text>
+                            </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(dateItem, index) => index.toString()} // Используем индекс как ключ
+                    keyExtractor={(dateItem, index) => index.toString()}
                 />
             </View>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity 
-                    style={styles.actionButton} 
+                <TouchableOpacity
+                    style={styles.actionButton}
                     onPress={() => navigateToDetail(item)}
                 >
                     <Text style={styles.buttonText}>Добавить</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={styles.actionButton} 
-                    onPress={() => navigateToEdit(item)} 
-                >
-                    <Text style={styles.buttonText}>Редактировать</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -107,9 +104,9 @@ const RequestList = ({ navigation }) => {
                 keyExtractor={(item) => item.id.toString()}
             />
             {requests.length > 0 && (
-                <Button 
-                    title="Отправить заявки" 
-                    onPress={handleSendRequests} 
+                <Button
+                    title="Отправить заявки"
+                    onPress={handleSendRequests}
                 />
             )}
         </View>

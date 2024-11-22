@@ -15,7 +15,7 @@ const SignInScreen = ({ navigation }) => {
             await AsyncStorage.setItem('accessToken', tokens.access);
             await AsyncStorage.setItem('refreshToken', tokens.refresh);
             Alert.alert('Успешный вход', 'Добро пожаловать на платформу управления спецтехникой!');
-            navigation.navigate('HomeScreen');
+            navigation.navigate('Main');
         } catch (error) {
             console.error('Ошибка авторизации:', error);
             Alert.alert('Ошибка', 'Неверный логин или пароль');
@@ -27,7 +27,6 @@ const SignInScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Вход в систему</Text>
-            <Button title="Войти" onPress={() => navigation.navigate('Main')} color="#FFC107" />
             <TextInput
                 style={styles.input}
                 placeholder="Логин"

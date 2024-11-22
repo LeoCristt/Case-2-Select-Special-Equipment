@@ -46,15 +46,13 @@ const DispatcherDashboard = () => {
             <Text>Плановое время приезда: {item.plannedArrivalTime}</Text>
             <Text>Плановое время выезда: {item.plannedDepartureTime}</Text>
             <Text>Госномер а/м: {item.vehicleRegistrationNumber || 'Не назначен'}</Text>
-            
+
             {item.vehicleRegistrationNumber ? (
                 <TouchableOpacity
                     style={styles.confirmButton}
-                    onPress={() => {
-                        // Здесь можно добавить логику подтверждения
-                    }}
+                    onPress={() => navigation.navigate('SelectEquipment', { requestId: item.id })}
                 >
-                    <Text style={styles.buttonText}>Подтвердить выбор</Text>
+                    <Text style={styles.buttonText}>Изменить выбор а/м</Text>
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity

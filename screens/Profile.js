@@ -35,9 +35,6 @@ const ProfileScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Профиль</Text>
-            </View>
             <View style={styles.profileInfo}>
                 <Image
                     source={getProfileImage(user.role)} // Используем функцию для получения изображения
@@ -59,18 +56,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f5f5f5',
         padding: 20,
-    },
-    header: {
-        backgroundColor: '#6200ee',
-        padding: 20,
-        borderRadius: 10,
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    headerText: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: 'bold',
     },
     profileInfo: {
         alignItems: 'center',
