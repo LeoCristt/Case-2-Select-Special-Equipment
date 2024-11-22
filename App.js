@@ -3,9 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-
 import AuthProvider from './services/AuthContext';
-
 import HomeScreen from './screens/HomeScreen';
 import RequestForm from './screens/RequestForm';
 import RequestList from './screens/RequestList';
@@ -16,11 +14,11 @@ import SelectEquipment from './screens/SelectEquipment';
 import RouteSheet from './screens/RouteSheet';
 import SignIn from './screens/SignIn';
 import Profile from './screens/Profile';
+import OrderEquipment from './screens/OrderEquipment';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Основной стек навигации
 const HomeStack = () => {
     return (
         <Stack.Navigator initialRouteName="SignIn">
@@ -33,18 +31,19 @@ const HomeStack = () => {
             <Stack.Screen name="Dashboard" component={Dashboard} options={{ title: 'Моя Диспетчерская' }} />
             <Stack.Screen name="EditRequest" component={EditRequest} options={{ title: 'Редактирование заявки' }} />
             <Stack.Screen name="SelectEquipment" component={SelectEquipment} options={{ title: 'Выбор а/м' }} />
+            <Stack.Screen name="OrderEquipment" component={OrderEquipment} options={{ title: 'Заказ а/м у контрагента' }} />
             <Stack.Screen name="RouteSheet" component={RouteSheet} options={{ title: 'Путевой лист' }} />
         </Stack.Navigator>
     );
 };
 
-// Основные вкладки
+
 const MainTabs = () => {
     return (
         <Tab.Navigator>
             <Tab.Screen
                 name="Home"
-                component={HomeScreen} // Здесь должен быть компонент HomeScreen, а не HomeStack
+                component={HomeScreen} 
                 options={{
                     tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
                     title: 'Главная',
@@ -62,7 +61,7 @@ const MainTabs = () => {
     );
 };
 
-// Главный компонент приложения
+
 const App = () => {
     return (
         <AuthProvider>

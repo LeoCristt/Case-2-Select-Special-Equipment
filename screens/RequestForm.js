@@ -125,7 +125,7 @@ const RequestForm = ({ navigation }) => {
                 <TextInputMask
                     type={'datetime'}
                     options={{
-                        format: 'YYYY-MM-DD HH:MM',  // Маска для времени
+                        format: 'YYYY-MM-DD HH:MM',  
                     }}
                     value={newDateSlot}
                     onChangeText={setNewDateSlot}
@@ -135,7 +135,7 @@ const RequestForm = ({ navigation }) => {
                 <Button 
                     title="Добавить временной слот" 
                     onPress={addDateSlot} 
-                    disabled={!isFormValid() || !newDateSlot} // Деактивация кнопки, если поля не заполнены или время не введено
+                    disabled={!isFormValid() || !newDateSlot} 
                 />
 
                 <Text style={styles.label}>Добавленные временные слоты:</Text>
@@ -144,7 +144,7 @@ const RequestForm = ({ navigation }) => {
                 <Button 
                     title="Отправить заявку" 
                     onPress={handleSubmit} 
-                    disabled={dateSlots.length === 0} // Деактивация кнопки, если нет временных слотов
+                    disabled={dateSlots.length === 0} 
                 />
             </ScrollView>
         </KeyboardAvoidingView>

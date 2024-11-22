@@ -4,7 +4,6 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardA
 const EditRequest = ({ route, navigation }) => {
     const { dateItem } = route.params;
 
-    // Проверяем, что dateItem определен
     if (!dateItem) {
         console.error('dateItem не передан в EditRequest');
         return (

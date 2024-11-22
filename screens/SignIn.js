@@ -8,19 +8,22 @@ const SignInScreen = ({ navigation }) => {
     const { updateToken } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false); // Добавьте состояние для загрузки
+    const [loading, setLoading] = useState(false); 
 
     const handleSignIn = async () => {
-        setLoading(true); // Устанавливаем загрузку
+        setLoading(true); 
         try {
             const tokens = await login(username, password, updateToken);
             Alert.alert('Успешный вход', 'Добро пожаловать!');
-            navigation.navigate('Main');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Main' }], 
+            });
         } catch (error) {
             console.error('Ошибка авторизации:', error);
             Alert.alert('Ошибка', 'Неверный логин или пароль');
         } finally {
-            setLoading(false); // Останавливаем загрузку
+            setLoading(false); 
         }
     };
     

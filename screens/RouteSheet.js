@@ -16,9 +16,14 @@ const RouteSheet = ({ route, navigation }) => {
             <Text style={styles.title}>Подтверждение путевого листа</Text>
             <Text>Объект: {request.object}</Text>
             <Text>Тип техники: {request.type}</Text>
-            <Text>Плановое время приезда: {request.plannedArrivalTime}</Text>
             <Text>Плановое время выезда: {request.plannedDepartureTime}</Text>
+            <Text>Плановое время приезда на обьект: </Text>
+            <Text>Плановое время работы на обьекте (в часах сюда нада): {request.plannedArrivalTime}</Text>
             <Text>Госномер а/м: {request.vehicleRegistrationNumber || 'Не назначен'}</Text>
+            <Text>Фактическое время выезда: </Text>
+            <Text>Время прибытия: </Text>
+            <Text>Время работ на обьекте: </Text>
+            <Text>Время ожидания на обьекте: </Text>
 
             <Button title="Создать путевой лист" onPress={handleConfirm} />
         </View>
