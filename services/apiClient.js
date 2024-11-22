@@ -25,6 +25,7 @@ apiClient.interceptors.response.use(
                 }
 
                 // Обновляем accessToken
+                await AsyncStorage.removeItem('accessToken');
                 const { access } = await refreshAccessToken(refreshToken);
 
                 // Сохраняем новый accessToken

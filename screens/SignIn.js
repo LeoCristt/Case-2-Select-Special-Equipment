@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator, ImageBackground } from 'react-native';
 import { login } from '../services/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../services/AuthContext';
+
 
 const SignInScreen = ({ navigation }) => {
+    const { updateToken } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Добавьте состояние для загрузки
 
     const handleSignIn = async () => {
-        setLoading(true);
+        setLoading(true); // Устанавливаем загрузку
         try {
-            const tokens = await login(username, password);
-            await AsyncStorage.setItem('accessToken', tokens.access);
-            await AsyncStorage.setItem('refreshToken', tokens.refresh);
-            Alert.alert('Успешный вход', 'Добро пожаловать на платформу управления спецтехникой!');
+            const tokens = await login(username, password, updateToken);
+            Alert.alert('Успешный вход', 'Добро пожаловать!');
             navigation.navigate('Main');
         } catch (error) {
             console.error('Ошибка авторизации:', error);
             Alert.alert('Ошибка', 'Неверный логин или пароль');
         } finally {
-            setLoading(false);
+            setLoading(false); // Останавливаем загрузку
         }
     };
-
+    
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Вход в систему</Text>

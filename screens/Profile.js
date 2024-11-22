@@ -1,35 +1,22 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-
-// Функция для получения изображения в зависимости от роли
-const getProfileImage = (role) => {
-    switch (role) {
-        case 'dispatcher':
-            return require('../assets/profilelogo/dispatcher.png'); 
-        case 'logistician':
-            return require('../assets/profilelogo/logistician.png'); 
-        case 'master':
-            return require('../assets/profilelogo/master.png'); 
-        case 'admin':
-            return require('../assets/profilelogo/admin.png');
-        default:
-            return require('../assets/profilelogo/default.png'); 
-    }
-};
-
-// Примерные данные пользователя
-const mockUserData = {
-    name: 'Иван Иванов',
-    email: 'ivan.ivanov@example.com',
-    role: 'admin', // Пример роли
-};
+import { AuthContext } from '../services/AuthContext'; // Убедитесь, что путь к AuthContext корректен
 
 const ProfileScreen = ({ navigation }) => {
+    const { token, decodedToken } = useContext(AuthContext);
+
+    // Примерные данные пользователя
+    const mockUserData = {
+        name: decodedToken.username,
+        role: decodedToken.role, // Пример роли
+    };
+
     const user = mockUserData; // Используем примерные данные
 
     const handleLogout = () => {
         // Логика выхода из аккаунта
         console.log('Выход из аккаунта');
+        navigation.navigate('SignIn');
         // Например, очистка токенов, переход на экран входа и т.д.
     };
 
@@ -49,6 +36,22 @@ const ProfileScreen = ({ navigation }) => {
             </TouchableOpacity>
         </View>
     );
+};
+
+// Функция для получения изображения в зависимости от роли
+const getProfileImage = (role) => {
+    switch (role) {
+        case 'dispatcher':
+            return require('../assets/profilelogo/dispatcher.png'); 
+        case 'logistician':
+            return require('../assets/profilelogo/logistician.png'); 
+        case 'master':
+            return require('../assets/profilelogo/master.png'); 
+        case 'admin':
+            return require('../assets/profilelogo/admin.png');
+        default:
+            return require('../assets/profilelogo/default.png'); 
+    }
 };
 
 const styles = StyleSheet.create({
