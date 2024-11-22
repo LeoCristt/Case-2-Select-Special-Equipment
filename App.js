@@ -19,11 +19,9 @@ import OrderEquipment from './screens/OrderEquipment';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const HomeStack = () => {
+const RequestStack = () => {
     return (
-        <Stack.Navigator initialRouteName="SignIn">
-            <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
-            <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        <Stack.Navigator>
             <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ title: 'Главная' }} />
             <Stack.Screen name="RequestForm" component={RequestForm} options={{ title: 'Создание сводной заявки' }} />
             <Stack.Screen name="RequestList" component={RequestList} options={{ title: 'Список заявок' }} />
@@ -37,31 +35,47 @@ const HomeStack = () => {
     );
 };
 
+const ProfilePage = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="Profile" component={Profile} options={{ title: 'Профиль'}} />
+        </Stack.Navigator>
+    )
+}
 
 const MainTabs = () => {
     return (
         <Tab.Navigator>
             <Tab.Screen
-                name="Home"
-                component={HomeScreen} 
+                name="Главная"
+                component={RequestStack} 
                 options={{
                     tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
-                    title: 'Главная',
+                    headerShown: false,
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="Профиль"
+                component={ProfilePage}
                 options={{
                     tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
-                    title: 'Профиль',
+                    headerShown: false,
                 }}
             />
         </Tab.Navigator>
     );
 };
 
+const HomeStack = () => {
+    return (
+        <Stack.Navigator initialRouteName="SignIn">
+            <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
+            <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        </Stack.Navigator>
+    );
+};
 
+// Главный компонент приложения
 const App = () => {
     return (
         <AuthProvider>
