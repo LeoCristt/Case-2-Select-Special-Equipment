@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RequestList, SubdivisionList, TypeList, MasterList, CustomTokenObtainPairView  # Импортируем кастомное представление
+from .views import RequestList, SubdivisionList, MasterList, CustomTokenObtainPairView  # Импортируем кастомное представление
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -12,8 +12,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('subdivision/', SubdivisionList.as_view(), name='subdivision-list'),
-
-    path('type/', TypeList.as_view(), name='type-list'),
 
     path('master/', MasterList.as_view(), name='master-list'),
 ]

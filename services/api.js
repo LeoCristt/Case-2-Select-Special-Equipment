@@ -32,10 +32,10 @@ export const patchRequest = async (requestData) => {
     }
 };
 
-export const patchRequest_edit = async (requestData, request_id) => {
+export const patchRequest_edit = async (requestData, request_id, dateItem_index) => {
     try {
         const { list_index, ...remainingRequestData } = requestData;
-        const response = await apiClient.patch(`/request/${request_id}/${requestData.list_index}/`, remainingRequestData);
+        const response = await apiClient.patch(`/request/${request_id}/${dateItem_index}/`, remainingRequestData);
         return response.data;
     } catch (error) {
         console.error('Ошибка при изменении заявки:', error);

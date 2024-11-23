@@ -38,9 +38,10 @@ const RequestList = ({ navigation }) => {
         navigation.navigate('RequestDetail', { request });
     };
 
-    const navigateToEdit = (dateItem, item) => {
+    const navigateToEdit = (dateItem, item, index) => {
         const request_id = item.id;
-        navigation.navigate('EditRequest', { dateItem, request_id }); 
+        const dateItem_index = index;
+        navigation.navigate('EditRequest', { dateItem, request_id,  dateItem_index}); 
     };
 
     const handleSendRequests = async () => {
@@ -57,11 +58,11 @@ const RequestList = ({ navigation }) => {
 
     const renderRequestItem = ({ item }) => (
         <View style={styles.requestItem}>
-            <Text style={styles.requestTitle}>Заявка: {item.master.last_name + item.master.first_name + item.master.patronymic}</Text>
+            <Text style={styles.requestTitle}>Заявка: {item.master.name}</Text>
             <View style={styles.datesContainer}>
                 <FlatList
-                    data={item.date_type_quantity_plannedWorkTime}
-                    renderItem={({ item: dateItem }) => (
+                    data={item.date_type_quantity_plannedWorkTime_machinery}
+                    renderItem={({ item: dateItem, index  }) => (
                         <View style={styles.dateItem}>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <Text>Тип техники: {dateItem.type}</Text>
@@ -71,7 +72,7 @@ const RequestList = ({ navigation }) => {
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <TouchableOpacity
                                 style={styles.editButton} 
-                                onPress={() => navigateToEdit(dateItem)} 
+                                onPress={() => navigateToEdit(dateItem, item, index)} 
                             >
                                 <Text style={styles.buttonText}>Редактировать</Text>
                             </TouchableOpacity>

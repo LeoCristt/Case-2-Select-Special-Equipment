@@ -9,7 +9,7 @@ const Dashboard = () => {
     const [summaryRequests, setSummaryRequests] = useState([
         {
             id: 1,
-            object: "Строительство здания",
+            facility: "Строительство здания",
             type: "Экскаватор",
             quantity: 1,
             plannedArrivalTime: "2023-10-01 - 08:00",
@@ -19,7 +19,7 @@ const Dashboard = () => {
         },
         {
             id: 2,
-            object: "Укладка асфальта",
+            facility: "Укладка асфальта",
             type: "Бульдозер",
             quantity: 1,
             plannedArrivalTime: "2023-10-01 - 09:00",
@@ -29,7 +29,7 @@ const Dashboard = () => {
         },
         {
             id: 3,
-            object: "Ремонт дороги",
+            facility: "Ремонт дороги",
             type: "Кран",
             quantity: 1,
             plannedArrivalTime: "2023-10-01 - 10:00",
@@ -41,7 +41,7 @@ const Dashboard = () => {
 
     const renderRequestItem = ({ item }) => (
         <View style={styles.requestItem}>
-            <Text>Объект: {item.object}</Text>
+            <Text>Объект: {item.facility}</Text>
             <Text>Тип техники: {item.type}</Text>
             <Text>Плановое время приезда: {item.plannedArrivalTime}</Text>
             <Text>Плановое время выезда: {item.plannedDepartureTime}</Text>

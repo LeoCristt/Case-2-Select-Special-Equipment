@@ -76,7 +76,7 @@ const RequestForm = ({ navigation }) => {
 
             const { type, quantity, plannedWorkTime, ...remainingRequestData } = requestData;
 
-            await createRequest({ ...remainingRequestData, date_type_quantity_plannedWorkTime: formattedDateSlots });
+            await createRequest({ ...remainingRequestData, date_type_quantity_plannedWorkTime_machinery: formattedDateSlots });
             navigation.navigate('RequestList'); 
         } catch (error) {
             console.error('Ошибка при отправке заявки:', error);
