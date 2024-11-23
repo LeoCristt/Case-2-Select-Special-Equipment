@@ -24,19 +24,25 @@ class RequestList(APIView):
             # Преобразуем объект модели в словарь
             request_data = {
                 "id": request_obj.id,
-                "master": str(request_obj.master),  # Преобразуем мастера в строку
+                "master": {
+                    "first_name": request_obj.master.first_name,
+                    "last_name": request_obj.master.last_name,
+                    "patronymic": request_obj.master.patronymic,
+                    "object": str(request_obj.master.object)
+                },
                 "distance": request_obj.distance,
                 "processed_by_logistician": request_obj.processed_by_logistician,
                 "date_type_quantity_plannedWorkTime": []
             }
 
-            # Преобразуем date_type_quantity_plannedWorkTime
-            for entry in request_obj.date_type_quantity_plannedWorkTime:
+            for index, entry in enumerate(request_obj.date_type_quantity_plannedWorkTime):
                 type_id = entry.get("type")
                 if type_id:
                     # Заменяем индекс type на его имя
                     type_name = Type.objects.get(id=type_id).name
                     entry["type"] = type_name
+                # Добавляем индекс итерации в данные (если нужно)
+                entry["list_index"] = index
                 request_data["date_type_quantity_plannedWorkTime"].append(entry)
 
             result.append(request_data)
@@ -83,7 +89,7 @@ class RequestList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def patch(self, request, pk=None):
+    def patch(self, request, pk=None, list_index=None):
         try:
             # Получаем объект по первичному ключу (pk)
             request_instance = Request.objects.get(pk=pk)
@@ -109,7 +115,11 @@ class RequestList(APIView):
             return Response({"error": "Field 'type' is required in the new entry."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Добавляем новый словарь в существующие данные
-        existing_data.append(new_data)
+        if list_index == None:
+            existing_data.append(new_data)
+        else:
+            existing_data[list_index] = new_data
+            print(new_data)
 
         # Обновляем поле модели
         request_instance.date_type_quantity_plannedWorkTime = existing_data
@@ -117,8 +127,6 @@ class RequestList(APIView):
 
         return Response({"success": "Entry added successfully", "updated_data": existing_data}, status=status.HTTP_200_OK)
 
-    
-    #def put (self, request, pk=None):
 
 class SubdivisionList(APIView):
     def get(self, request):
