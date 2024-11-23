@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { AuthContext } from '../services/AuthContext'; 
 
 const SelectEquipment = ({ navigation }) => {
+    const { token, decodedToken } = useContext(AuthContext);
     // Примерные данные для транспортных средств
     const [equipmentList] = useState([
         { id: "A001", type: "Экскаватор", registrationNumber: "1234AB" },
@@ -59,6 +61,7 @@ const SelectEquipment = ({ navigation }) => {
                 renderItem={renderEquipmentItem}
                 contentContainerStyle={styles.list}
             />
+            {(decodedToken.role === "dispatcher" || decodedToken.role === "admin") && (
             <View style={styles.noEquipmentContainer}>
                 <Text style={styles.noEquipmentText}>Если вы не нашли необходимую технику.</Text>
                 <Button
@@ -68,7 +71,7 @@ const SelectEquipment = ({ navigation }) => {
                     }}
                 />
             </View>
-
+            )}
         </View>
     );
 };
