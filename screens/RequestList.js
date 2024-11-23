@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
 import { fetchRequests, sendRequests } from '../services/api';
-import { AuthContext } from '../services/AuthContext'; // Убедитесь, что путь к AuthContext корректен
+import { AuthContext } from '../services/AuthContext'; 
 
 const RequestList = ({ navigation }) => {
     const [requests, setRequests] = useState([]);
@@ -70,8 +70,8 @@ const RequestList = ({ navigation }) => {
                             <Text>Время подачи: {dateItem.date}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => navigateToEdit(dateItem, item)} // Передаем только dateItem
+                                style={styles.editButton} 
+                                onPress={() => navigateToEdit(dateItem)} 
                             >
                                 <Text style={styles.buttonText}>Редактировать</Text>
                             </TouchableOpacity>
@@ -82,10 +82,10 @@ const RequestList = ({ navigation }) => {
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    style={styles.actionButton}
+                    style={styles.addButton} 
                     onPress={() => navigateToDetail(item)}
                 >
-                    <Text style={styles.buttonText}>Добавить</Text>
+                    <Text style={styles.buttonText}>Добавить а/м</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -133,6 +133,23 @@ const styles = StyleSheet.create({
     dateItem: {
         marginBottom: 10,
     },
+    editButton: {
+        backgroundColor: '#6c757d', 
+        padding: 8, 
+        borderRadius: 5,
+        flex: 1,
+        marginRight: 5,
+        width: 150, 
+        height: 40,
+        alignSelf: 'flex-start',
+    },
+    addButton: {
+        backgroundColor: '#007BFF', 
+        padding: 10,
+        borderRadius: 5,
+        flex: 1,
+        marginHorizontal: 5,
+    },
     separator: {
         color: '#ccc',
     },
@@ -146,12 +163,13 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         flex: 1,
-        marginHorizontal: 5,
+        marginRight: 5, 
     },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
+        
     },
 });
 

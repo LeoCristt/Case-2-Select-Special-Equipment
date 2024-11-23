@@ -1,22 +1,23 @@
 import React, {useContext} from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { AuthContext } from '../services/AuthContext'; // Убедитесь, что путь к AuthContext корректен
+import { AuthContext } from '../services/AuthContext'; 
 
 const ProfileScreen = ({ navigation }) => {
     const { token, decodedToken } = useContext(AuthContext);
 
     // Примерные данные пользователя
-    const mockUserData = {
+    const user = {
         name: decodedToken.username,
         role: decodedToken.role, // Пример роли
     };
 
-    const user = mockUserData; // Используем примерные данные
-
     const handleLogout = () => {
         // Логика выхода из аккаунта
         console.log('Выход из аккаунта');
-        navigation.navigate('SignIn');
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'SignIn' }], // Указываем экран входа как начальный маршрут
+        });
         // Например, очистка токенов, переход на экран входа и т.д.
     };
 
@@ -38,7 +39,7 @@ const ProfileScreen = ({ navigation }) => {
     );
 };
 
-// Функция для получения изображения в зависимости от роли
+
 const getProfileImage = (role) => {
     switch (role) {
         case 'dispatcher':

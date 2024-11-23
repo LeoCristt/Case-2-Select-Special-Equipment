@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { patchRequest } from '../services/api';
 import { TextInputMask } from 'react-native-masked-text';
-import { useNavigation } from '@react-navigation/native'; // Импортируем useNavigation
+import { useNavigation } from '@react-navigation/native';
 
 const RequestDetail = ({ route }) => {
-    const navigation = useNavigation(); // Получаем объект navigation
-    const { request } = route.params; 
+    const navigation = useNavigation();
+    const { request } = route.params;
     const [type, setType] = useState('');
     const [quantity, setQuantity] = useState('');
     const [plannedWorkTime, setPlannedWorkTime] = useState('');
@@ -20,44 +20,52 @@ const RequestDetail = ({ route }) => {
             setQuantity('');
             setPlannedWorkTime('');
             setDate('');
-            navigation.navigate('RequestList'); 
+            navigation.navigate('RequestList');
         }
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>Тип техники:</Text>
-            <TextInput
-                style={styles.input}
-                value={type}
-                onChangeText={setType}
-            />
-            <Text style={styles.label}>Количество:</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType='numeric'
-                value={quantity}
-                onChangeText={setQuantity}
-            />
-            <Text style={styles.label}>Плановое время работы:</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType='numeric'
-                value={plannedWorkTime}
-                onChangeText={setPlannedWorkTime}
-            />
-            <Text style={styles.label}>Время подачи:</Text>
-            <TextInputMask
-                type={'datetime'}
-                options={{
-                    format: 'YYYY-MM-DD HH:mm'
-                }}
-                value={date}
-                onChangeText={setDate}
-                style={styles.input}
-            />
-            <Button title="Добавить" onPress={addEquipment} />
-        </View>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "android" ? "padding" : "height"}
+            keyboardVerticalOffset={100}
+        >
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                <View style={styles.container}>
+                    <Text style={styles.label}>Тип техники:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={type}
+                        onChangeText={setType}
+                    />
+                    <Text style={styles.label}>Количество:</Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType='numeric'
+                        value={quantity}
+                        onChangeText={setQuantity}
+                    />
+                    <Text style={styles.label}>Плановое время работы:</Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType='numeric'
+                        value={plannedWorkTime}
+                        onChangeText={setPlannedWorkTime}
+                    />
+                    <Text style={styles.label}>Время подачи:</Text>
+                    <TextInputMask
+                        type={'datetime'}
+                        options={{
+                            format: 'YYYY-MM-DD HH:mm'
+                        }}
+                        value={date}
+                        onChangeText={setDate}
+                        style={styles.input}
+                    />
+                    <Button title="Добавить" onPress={addEquipment} />
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -66,6 +74,10 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f8f8f8',
         flex: 1,
+    },
+    scrollView: {
+        padding: 20,
+        paddingBottom: 40,
     },
     label: {
         fontSize: 18,

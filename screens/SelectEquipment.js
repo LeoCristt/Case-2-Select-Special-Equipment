@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
 
 const SelectEquipment = ({ navigation }) => {
     // Примерные данные для транспортных средств
@@ -37,7 +37,6 @@ const SelectEquipment = ({ navigation }) => {
         <TouchableOpacity
             style={styles.equipmentItem}
             onPress={() => {
-                // Здесь можно добавить логику для назначения техники
                 navigation.navigate('DispatcherDashboard', { selectedEquipment: item });
             }}
         >
@@ -47,7 +46,7 @@ const SelectEquipment = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Выбор техники</Text>
+            <Text style={styles.title}>Выбор свободной техники:</Text>
             <TextInput
                 style={styles.searchInput}
                 placeholder="Поиск по госномеру или типу..."
@@ -60,6 +59,16 @@ const SelectEquipment = ({ navigation }) => {
                 renderItem={renderEquipmentItem}
                 contentContainerStyle={styles.list}
             />
+            <View style={styles.noEquipmentContainer}>
+                <Text style={styles.noEquipmentText}>Если вы не нашли необходимую технику.</Text>
+                <Button
+                    title="Заказать у контрагента"
+                    onPress={() => {
+                        navigation.navigate('OrderEquipment')
+                    }}
+                />
+            </View>
+
         </View>
     );
 };
@@ -91,6 +100,14 @@ const styles = StyleSheet.create({
     },
     list: {
         paddingBottom: 20,
+    },
+    noEquipmentContainer: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    noEquipmentText: {
+        fontSize: 18,
+        marginBottom: 10,
     },
 });
 

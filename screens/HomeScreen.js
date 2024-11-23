@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { AuthContext } from '../services/AuthContext'; // Убедитесь, что путь к AuthContext корректен
+import { AuthContext } from '../services/AuthContext'; 
 
 const HomeScreen = ({ navigation }) => {
     const { token, decodedToken } = useContext(AuthContext);
@@ -12,21 +12,21 @@ const HomeScreen = ({ navigation }) => {
                 <Button
                 title="Создать заявку"
                 onPress={() => navigation.navigate('RequestForm')}
-                color="#FFC107" // Цвет кнопки
+                color="#FFC107" 
                 />
             )}
             {(decodedToken.role === "logistician" || decodedToken.role === "admin") && (
                 <Button
                 title="Посмотреть заявки"
                 onPress={() => navigation.navigate('RequestList')}
-                 color="#FFC107" // Цвет кнопки
+                 color="#FFC107" 
                 />
             )}
             {(decodedToken.role === "dispatcher" || decodedToken.role === "admin") && (
                 <Button
                 title="Рабочий стол"
                 onPress={() => navigation.navigate('Dashboard')}
-                color="#FFC107" // Цвет кнопки
+                color="#FFC107" 
                 />
             )}
         </View>
@@ -38,19 +38,19 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#e0f7fa', // Измененный цвет фона
+        backgroundColor: '#e0f7fa', 
         padding: 20,
     },
     title: {
         fontSize: 24,
         marginBottom: 30,
-        color: '#003366', // Цвет заголовка
+        color: '#003366', 
         textAlign: 'center',
     },
     buttonContainer: {
         width: '100%',
         alignItems: 'center',
-        gap: 10, // Отступ между кнопками
+        gap: 10, 
     },
 });
 

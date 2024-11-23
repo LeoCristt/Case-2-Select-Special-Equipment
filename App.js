@@ -3,9 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-
 import AuthProvider from './services/AuthContext';
-
 import HomeScreen from './screens/HomeScreen';
 import RequestForm from './screens/RequestForm';
 import RequestList from './screens/RequestList';
@@ -16,16 +14,14 @@ import SelectEquipment from './screens/SelectEquipment';
 import RouteSheet from './screens/RouteSheet';
 import SignIn from './screens/SignIn';
 import Profile from './screens/Profile';
+import OrderEquipment from './screens/OrderEquipment';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Основной стек навигации
-const HomeStack = () => {
+const RequestStack = () => {
     return (
-        <Stack.Navigator initialRouteName="SignIn">
-            <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
-            <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        <Stack.Navigator>
             <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ title: 'Главная' }} />
             <Stack.Screen name="RequestForm" component={RequestForm} options={{ title: 'Создание сводной заявки' }} />
             <Stack.Screen name="RequestList" component={RequestList} options={{ title: 'Список заявок' }} />
@@ -33,32 +29,49 @@ const HomeStack = () => {
             <Stack.Screen name="Dashboard" component={Dashboard} options={{ title: 'Моя Диспетчерская' }} />
             <Stack.Screen name="EditRequest" component={EditRequest} options={{ title: 'Редактирование заявки' }} />
             <Stack.Screen name="SelectEquipment" component={SelectEquipment} options={{ title: 'Выбор а/м' }} />
+            <Stack.Screen name="OrderEquipment" component={OrderEquipment} options={{ title: 'Заказ а/м у контрагента' }} />
             <Stack.Screen name="RouteSheet" component={RouteSheet} options={{ title: 'Путевой лист' }} />
         </Stack.Navigator>
     );
 };
 
-// Основные вкладки
+const ProfilePage = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="Profile" component={Profile} options={{ title: 'Профиль'}} />
+        </Stack.Navigator>
+    )
+}
+
 const MainTabs = () => {
     return (
         <Tab.Navigator>
             <Tab.Screen
-                name="Home"
-                component={HomeScreen} // Здесь должен быть компонент HomeScreen, а не HomeStack
+                name="Главная"
+                component={RequestStack} 
                 options={{
                     tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
-                    title: 'Главная',
+                    headerShown: false,
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={Profile}
+                name="Профиль"
+                component={ProfilePage}
                 options={{
                     tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
-                    title: 'Профиль',
+                    headerShown: false,
                 }}
             />
         </Tab.Navigator>
+    );
+};
+
+const HomeStack = () => {
+    return (
+        <Stack.Navigator initialRouteName="SignIn">
+            <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
+            <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+        </Stack.Navigator>
     );
 };
 
