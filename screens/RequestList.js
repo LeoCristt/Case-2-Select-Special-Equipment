@@ -82,8 +82,8 @@ const RequestList = ({ navigation }) => {
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    style={styles.addButton} 
-                    onPress={() => navigateToDetail(item)}
+                    style={styles.addButton}
+                    onPress={() => navigation.navigate('SelectEquipment', { requestId: item.id })}
                 >
                     <Text style={styles.buttonText}>Добавить а/м</Text>
                 </TouchableOpacity>
