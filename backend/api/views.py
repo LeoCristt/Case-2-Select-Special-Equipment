@@ -24,7 +24,12 @@ class RequestList(APIView):
             # Преобразуем объект модели в словарь
             request_data = {
                 "id": request_obj.id,
-                "master": str(request_obj.master),  # Преобразуем мастера в строку
+                "master": {
+                    "first_name": request_obj.master.first_name,
+                    "last_name": request_obj.master.last_name,
+                    "patronymic": request_obj.master.patronymic,
+                    "object": str(request_obj.master.object)
+                },
                 "distance": request_obj.distance,
                 "processed_by_logistician": request_obj.processed_by_logistician,
                 "date_type_quantity_plannedWorkTime": []

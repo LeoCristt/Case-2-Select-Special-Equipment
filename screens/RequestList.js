@@ -57,7 +57,7 @@ const RequestList = ({ navigation }) => {
 
     const renderRequestItem = ({ item }) => (
         <View style={styles.requestItem}>
-            <Text style={styles.requestTitle}>Заявка: {item.master}</Text>
+            <Text style={styles.requestTitle}>Заявка: {item.master.last_name + item.master.first_name + item.master.patronymic}</Text>
             <View style={styles.datesContainer}>
                 <FlatList
                     data={item.date_type_quantity_plannedWorkTime}
