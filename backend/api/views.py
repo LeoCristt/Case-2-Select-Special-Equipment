@@ -2,21 +2,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Request
-from .serializers import RequestSerializer
+from .serializers import RequestSerializer, MachinerySerializer
 from rest_framework.exceptions import NotFound
 from rest_framework import serializers
-from .models import CustomUser, Subdivision, Master
+from .models import CustomUser, Subdivision, Master, Machinery
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class RequestList(APIView):
     def get(self, request, subdivision=None):
-        try:
-            subdivisionObj = Subdivision.objects.get(name=subdivision)
-        except Subdivision.DoesNotExist:
-            return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
+        if subdivision != None:
+            try:
+                subdivisionObj = Subdivision.objects.get(name=subdivision)
+            except Subdivision.DoesNotExist:
+                return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        requests = Request.objects.filter(subdivision=subdivisionObj)
+            requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True)
+        else:
+            requests = Request.objects.filter(processed_by_logistician=True)
 
         # Преобразуем данные для ответа
         result = []
@@ -30,7 +33,8 @@ class RequestList(APIView):
                 },
                 "distance": request_obj.distance,
                 "processed_by_logistician": request_obj.processed_by_logistician,
-                "date_type_quantity_plannedWorkTime_machinery": request_obj.date_type_quantity_plannedWorkTime_machinery
+                "date_type_quantity_plannedWorkTime_machinery": request_obj.date_type_quantity_plannedWorkTime_machinery,
+
             }
 
             result.append(request_data)
@@ -73,14 +77,15 @@ class RequestList(APIView):
         # Получаем данные из запроса
         new_data = request.data
         if not new_data or not isinstance(new_data, dict):
-            return Response({"error": "Invalid data format. New entry must be a dictionary."}, status=status.HTTP_400_BAD_REQUEST)
+            request_instance.processed_by_logistician = True
+            request_instance.save()
+            return Response({"success": "Обработано логистом."}, status=status.HTTP_200_OK)
 
         # Добавляем новый словарь в существующие данные
         if list_index == None:
             existing_data.append(new_data)
         else:
             existing_data[list_index] = new_data
-            print(new_data)
 
         # Обновляем поле модели
         request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data
@@ -99,6 +104,12 @@ class MasterList(APIView):
     def get(self, request):
         requests = Master.objects.all()
         serializer = RequestSerializer(requests, many=True)
+        return Response(serializer.data)
+
+class MachineryList(APIView):
+    def get(self, request):
+        requests = Machinery.objects.all()
+        serializer = MachinerySerializer(requests, many=True)
         return Response(serializer.data)
 
 # Создаем новый сериализатор для получения токенов с дополнительными данными
