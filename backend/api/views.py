@@ -5,7 +5,7 @@ from .models import Request
 from .serializers import RequestSerializer, MachinerySerializer
 from rest_framework.exceptions import NotFound
 from rest_framework import serializers
-from .models import CustomUser, Subdivision, Master, Machinery
+from .models import CustomUser, Subdivision, Master, Machinery, Waybill
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -19,7 +19,7 @@ class RequestList(APIView):
         
             requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True)
         else:
-            requests = Request.objects.filter(processed_by_logistician=True)
+            requests = Request.objects.filter(processed_by_logistician=True).order_by('date_type_quantity_plannedWorkTime_machinery')
 
         # Преобразуем данные для ответа
         result = []
@@ -108,7 +108,8 @@ class MasterList(APIView):
 
 class MachineryList(APIView):
     def get(self, request):
-        requests = Machinery.objects.all()
+        busy_machineries = Waybill.objects.filter(closed=False).values_list('machinery', flat=True)
+        requests = Machinery.objects.all().exclude(license_plate__in=busy_machineries)
         serializer = MachinerySerializer(requests, many=True)
         return Response(serializer.data)
 
