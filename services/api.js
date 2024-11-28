@@ -1,9 +1,28 @@
 import apiClient from './apiClient'; // Подключаем настроенный axios
 
 export const fetchRequests = async (subdivision) => {
-
     try {
         const response = await apiClient.get(`/request/${subdivision}/`);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при получении заявок:', error);
+        throw error;
+    }
+};
+
+export const fetchRequests_dispatcher = async () => {
+    try {
+        const response = await apiClient.get(`/request/`);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при получении заявок:', error);
+        throw error;
+    }
+};
+
+export const fetchMachineries = async () => {
+    try {
+        const response = await apiClient.get(`/machinery/`);
         return response.data;
     } catch (error) {
         console.error('Ошибка при получении заявок:', error);
@@ -32,13 +51,39 @@ export const patchRequest = async (requestData) => {
     }
 };
 
-export const patchRequest_edit = async (requestData, request_id) => {
+export const patchRequest_edit = async (requestData, request_id, dateItem_index) => {
     try {
         const { list_index, ...remainingRequestData } = requestData;
-        const response = await apiClient.patch(`/request/${request_id}/${requestData.list_index}/`, remainingRequestData);
+        const response = await apiClient.patch(`/request/${request_id}/${dateItem_index}/`, remainingRequestData);
         return response.data;
     } catch (error) {
         console.error('Ошибка при изменении заявки:', error);
+        throw error;
+    }
+};
+
+export const sendRequests = async (requestIds) => {
+    try {
+        // Массив для хранения результатов запросов
+        const results = [];
+
+        // Проходим по каждому requestId
+        for (const id of requestIds) {
+            try {
+                // Отправляем запрос для каждого id
+                const response = await apiClient.patch(`/request/${id}/`);
+                results.push(response.data);  // Добавляем результат в массив
+            } catch (error) {
+                console.error(`Ошибка при отправке заявки с id ${id}:`, error);
+                // Можно сохранить ошибку в массив, если нужно обработать ее позже
+                results.push({ error: `Ошибка при отправке заявки с id ${id}` });
+            }
+        }
+
+        // Возвращаем все результаты
+        return results;
+    } catch (error) {
+        console.error('Ошибка при обработке всех заявок:', error);
         throw error;
     }
 };

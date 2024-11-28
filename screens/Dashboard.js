@@ -1,76 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { fetchRequests_dispatcher } from '../services/api';
 
 const Dashboard = () => {
     const navigation = useNavigation();
 
     // Примерные данные для заявок
-    const [summaryRequests, setSummaryRequests] = useState([
-        {
-            id: 1,
-            object: "Строительство здания",
-            type: "Экскаватор",
-            quantity: 1,
-            plannedArrivalTime: "2023-10-01 - 08:00",
-            plannedDepartureTime: "2023-10-01 - 17:00",
-            vehicleRegistrationNumber: "1234AB", // Транспорт назначен
-            submissionTime: "2023-09-30T12:00:00"
-        },
-        {
-            id: 2,
-            object: "Укладка асфальта",
-            type: "Бульдозер",
-            quantity: 1,
-            plannedArrivalTime: "2023-10-01 - 09:00",
-            plannedDepartureTime: "2023-10-01 - 15:00",
-            vehicleRegistrationNumber: null, // Транспорт не назначен
-            submissionTime: "2023-09-30T13:00:00"
-        },
-        {
-            id: 3,
-            object: "Ремонт дороги",
-            type: "Кран",
-            quantity: 1,
-            plannedArrivalTime: "2023-10-01 - 10:00",
-            plannedDepartureTime: "2023-10-01 - 14:00",
-            vehicleRegistrationNumber: "5678CD", // Транспорт назначен
-            submissionTime: "2023-09-30T14:00:00"
-        }
-    ]);
+    const [summaryRequests, setSummaryRequests] = useState([]);
 
-    const renderRequestItem = ({ item }) => (
-        <View style={styles.requestItem}>
-            <Text>Объект: {item.object}</Text>
-            <Text>Тип техники: {item.type}</Text>
-            <Text>Плановое время приезда: {item.plannedArrivalTime}</Text>
-            <Text>Плановое время выезда: {item.plannedDepartureTime}</Text>
-            <Text>Госномер а/м: {item.vehicleRegistrationNumber || 'Не назначен'}</Text>
+    useEffect(() => {
+        const loadRequests = async () => {
+            try {
+                const fetchedRequests = await fetchRequests_dispatcher();
+                setSummaryRequests(fetchedRequests);
+            } catch (error) {
+                console.error('Ошибка при загрузке заявок:', error);
+            }
+        };
 
-            {item.vehicleRegistrationNumber ? (
+        loadRequests();
+    }, []);
+
+    const renderRequestItem = ({ item }) => {
+        return (
+            <View style={styles.requestItem}>
+                <Text>Объект: {item.master.facility}</Text>
+    
+                {/* Список с элементами */}
+                <FlatList
+                    data={item.date_type_quantity_plannedWorkTime_machinery}
+                    renderItem={({ item: dateItem }) => {
+                        return (
+                            <View style={styles.dateItem}>
+                                <Text>Тип техники: {dateItem.type}</Text>
+                                <Text>Госномер а/м: {dateItem.machinery || 'Не назначен'}</Text>
+                                <Text>Плановое время выезда: {'Не назначен'}</Text>
+                                <Text>Плановое время приезда на объект: {dateItem.date}</Text>
+                                <Text>Плановое время работы на объекте: {dateItem.plannedWorkTime} часа</Text>
+    
+                                {dateItem.machinery ? (
+                                    <TouchableOpacity
+                                        style={styles.confirmButton}
+                                        onPress={() =>
+                                            navigation.navigate('SelectEquipment', {
+                                                requestId: item.id,
+                                                dateItemId: dateItem.id,
+                                            })
+                                        }
+                                    >
+                                        <Text style={styles.buttonText}>Изменить выбор а/м</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={styles.selectButton}
+                                        onPress={() =>
+                                            navigation.navigate('SelectEquipment', {
+                                                requestId: item.id,
+                                                dateItemId: dateItem.id,
+                                            })
+                                        }
+                                    >
+                                        <Text style={styles.buttonText}>Добавить ТС</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        );
+                    }}
+                    keyExtractor={(dateItem, index) => index.toString()}
+                />
+    
+                {/* Кнопка создания путевого листа */}
                 <TouchableOpacity
-                    style={styles.confirmButton}
-                    onPress={() => navigation.navigate('SelectEquipment', { requestId: item.id })}
+                    style={styles.routeSheetButton}
+                    onPress={() => navigation.navigate('RouteSheet', { request: item })}
                 >
-                    <Text style={styles.buttonText}>Изменить выбор а/м</Text>
+                    <Text style={styles.buttonText}>Создать путевой лист</Text>
                 </TouchableOpacity>
-            ) : (
-                <TouchableOpacity
-                    style={styles.selectButton}
-                    onPress={() => navigation.navigate('SelectEquipment', { requestId: item.id })}
-                >
-                    <Text style={styles.buttonText}>Добавить ТС</Text>
-                </TouchableOpacity>
-            )}
-
-            <TouchableOpacity
-                style={styles.routeSheetButton}
-                onPress={() => navigation.navigate('RouteSheet', { request: item })}
-            >
-                <Text style={styles.buttonText}>Создать путевой лист</Text>
-            </TouchableOpacity>
-        </View>
-    );
+            </View>
+        );
+    };    
 
     return (
         <View style={styles.container}>

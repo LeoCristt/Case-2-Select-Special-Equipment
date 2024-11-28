@@ -3,7 +3,7 @@ import { patchRequest_edit } from '../services/api';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 
 const EditRequest = ({ route, navigation }) => {
-    const { dateItem, request_id } = route.params;
+    const { dateItem, request_id, dateItem_index } = route.params;
 
     if (!dateItem) {
         console.error('dateItem не передан в EditRequest');
@@ -20,7 +20,7 @@ const EditRequest = ({ route, navigation }) => {
     const [date, setDate] = useState(dateItem.date);
 
     const handleSave = async () => {
-        await patchRequest_edit({"date": date, "plannedWorkTime": plannedWorkTime, "quantity": quantity, "type": type, "list_index": dateItem.list_index}, request_id)
+        await patchRequest_edit({"date": date, "plannedWorkTime": plannedWorkTime, "quantity": quantity, "type": type}, request_id, dateItem_index)
         navigation.navigate('RequestList'); 
     };
 

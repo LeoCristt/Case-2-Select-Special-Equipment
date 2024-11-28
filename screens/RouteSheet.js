@@ -14,7 +14,7 @@ const RouteSheet = ({ route, navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Подтверждение путевого листа</Text>
-            <Text>Объект: {request.object}</Text>
+            <Text>Объект: {request.facility}</Text>
             <Text>Тип техники: {request.type}</Text>
             <Text>Плановое время выезда: {request.plannedDepartureTime}</Text>
             <Text>Плановое время приезда на обьект: </Text>

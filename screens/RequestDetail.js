@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { patchRequest } from '../services/api';
 import { TextInputMask } from 'react-native-masked-text';
-import { useNavigation } from '@react-navigation/native';
+import { KeyboardAvoidingView } from 'react-native';
+import { Platform } from 'react-native';
+import { ScrollView } from 'react-native';
 
-
-const RequestDetail = ({ route }) => {
-    const navigation = useNavigation();
+const RequestDetail = ({ route, navigation }) => {
     const { request } = route.params;
     const [type, setType] = useState('');
     const [quantity, setQuantity] = useState('');

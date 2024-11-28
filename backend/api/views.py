@@ -2,21 +2,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Request
-from .serializers import RequestSerializer
+from .serializers import RequestSerializer, MachinerySerializer
 from rest_framework.exceptions import NotFound
 from rest_framework import serializers
-from .models import CustomUser, Subdivision, Type, Master
+from .models import CustomUser, Subdivision, Master, Machinery, Waybill
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class RequestList(APIView):
     def get(self, request, subdivision=None):
-        try:
-            subdivisionObj = Subdivision.objects.get(name=subdivision)
-        except Subdivision.DoesNotExist:
-            return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
+        if subdivision != None:
+            try:
+                subdivisionObj = Subdivision.objects.get(name=subdivision)
+            except Subdivision.DoesNotExist:
+                return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        requests = Request.objects.filter(subdivision=subdivisionObj)
+            requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True)
+        else:
+            requests = Request.objects.filter(processed_by_logistician=True).order_by('date_type_quantity_plannedWorkTime_machinery')
 
         # Преобразуем данные для ответа
         result = []
@@ -25,25 +28,14 @@ class RequestList(APIView):
             request_data = {
                 "id": request_obj.id,
                 "master": {
-                    "first_name": request_obj.master.first_name,
-                    "last_name": request_obj.master.last_name,
-                    "patronymic": request_obj.master.patronymic,
-                    "object": str(request_obj.master.object)
+                    "name": request_obj.master.name,
+                    "facility": request_obj.master.facility.name
                 },
                 "distance": request_obj.distance,
                 "processed_by_logistician": request_obj.processed_by_logistician,
-                "date_type_quantity_plannedWorkTime": []
-            }
+                "date_type_quantity_plannedWorkTime_machinery": request_obj.date_type_quantity_plannedWorkTime_machinery,
 
-            for index, entry in enumerate(request_obj.date_type_quantity_plannedWorkTime):
-                type_id = entry.get("type")
-                if type_id:
-                    # Заменяем индекс type на его имя
-                    type_name = Type.objects.get(id=type_id).name
-                    entry["type"] = type_name
-                # Добавляем индекс итерации в данные (если нужно)
-                entry["list_index"] = index
-                request_data["date_type_quantity_plannedWorkTime"].append(entry)
+            }
 
             result.append(request_data)
 
@@ -57,31 +49,14 @@ class RequestList(APIView):
         except Subdivision.DoesNotExist:
             return Response({"error": f"Subdivision with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        data['subdivision'] = subdivision.id  # Передаем ID объекта
-
-        master_data = request.data.get('master', '').split(" ")
-        
-        if len(master_data) != 3:
-            return Response({"error": "Invalid format for 'master'. Must include 'last_name', 'first_name', and 'patronymic'."}, status=status.HTTP_400_BAD_REQUEST)
+        data['subdivision'] = subdivision.name  # Передаем ID объекта
         
         try:
-            master = Master.objects.get(
-                last_name=master_data[0],
-                first_name=master_data[1],
-                patronymic=master_data[2]
-            )
+            master = Master.objects.get(name=request.data['master'])
         except Master.DoesNotExist:
             return Response({"error": f"Master with name '{request.data['master']}' does not exist."}, status=status.HTTP_404_NOT_FOUND)
         
-        data['master'] = master.id
-        
-        try:
-            for i in range(0, len(request.data['date_type_quantity_plannedWorkTime'])):
-                type = Type.objects.get(name=request.data['date_type_quantity_plannedWorkTime'][i]['type'])
-        except Subdivision.DoesNotExist:
-            return Response({"error": f"Type with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        data['date_type_quantity_plannedWorkTime'][i]['type'] = type.id
+        data['master'] = master.name
 
         serializer = RequestSerializer(data=data)
         if serializer.is_valid():
@@ -97,32 +72,23 @@ class RequestList(APIView):
             return Response({"error": f"Request with id {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
 
         # Получаем существующий JSON из поля date_type_quantity_plannedWorkTime
-        existing_data = request_instance.date_type_quantity_plannedWorkTime or []
+        existing_data = request_instance.date_type_quantity_plannedWorkTime_machinery or []
 
         # Получаем данные из запроса
         new_data = request.data
         if not new_data or not isinstance(new_data, dict):
-            return Response({"error": "Invalid data format. New entry must be a dictionary."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Проверяем, что поле 'type' в новом словаре существует и заменяем его значение на ID
-        if "type" in new_data:
-            try:
-                type_instance = Type.objects.get(name=new_data["type"])
-                new_data["type"] = type_instance.id  # Заменяем имя типа на его ID
-            except Type.DoesNotExist:
-                return Response({"error": f"Type with name '{new_data['type']}' not found."}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({"error": "Field 'type' is required in the new entry."}, status=status.HTTP_400_BAD_REQUEST)
+            request_instance.processed_by_logistician = True
+            request_instance.save()
+            return Response({"success": "Обработано логистом."}, status=status.HTTP_200_OK)
 
         # Добавляем новый словарь в существующие данные
         if list_index == None:
             existing_data.append(new_data)
         else:
             existing_data[list_index] = new_data
-            print(new_data)
 
         # Обновляем поле модели
-        request_instance.date_type_quantity_plannedWorkTime = existing_data
+        request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data
         request_instance.save()
 
         return Response({"success": "Entry added successfully", "updated_data": existing_data}, status=status.HTTP_200_OK)
@@ -134,16 +100,17 @@ class SubdivisionList(APIView):
         serializer = RequestSerializer(requests, many=True)
         return Response(serializer.data)
     
-class TypeList(APIView):
-    def get(self, request):
-        requests = Type.objects.all()
-        serializer = RequestSerializer(requests, many=True)
-        return Response(serializer.data)
-    
 class MasterList(APIView):
     def get(self, request):
         requests = Master.objects.all()
         serializer = RequestSerializer(requests, many=True)
+        return Response(serializer.data)
+
+class MachineryList(APIView):
+    def get(self, request):
+        busy_machineries = Waybill.objects.filter(closed=False).values_list('machinery', flat=True)
+        requests = Machinery.objects.all().exclude(license_plate__in=busy_machineries)
+        serializer = MachinerySerializer(requests, many=True)
         return Response(serializer.data)
 
 # Создаем новый сериализатор для получения токенов с дополнительными данными
