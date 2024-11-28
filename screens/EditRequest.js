@@ -21,7 +21,7 @@ const EditRequest = ({ route, navigation }) => {
 
     const handleSave = async () => {
         await patchRequest_edit({"date": date, "plannedWorkTime": plannedWorkTime, "quantity": quantity, "type": type}, request_id, dateItem_index)
-        navigation.navigate('RequestList'); 
+        navigation.navigate('RequestList');
     };
 
     return (

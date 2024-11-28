@@ -16,7 +16,7 @@ const OrderEquipment = ({ navigation }) => {
             requestDescription,
         });
         // После отправки заявки, можете перенаправить пользователя на другую страницу
-        navigation.navigate('SomewhereElse');
+        navigation.navigate('Dashboard');
     };
 
     return (

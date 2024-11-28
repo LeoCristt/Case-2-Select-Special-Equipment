@@ -8,6 +8,7 @@ from rest_framework import serializers
 from .models import CustomUser, Subdivision, Master, Machinery, Waybill
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from datetime import datetime
 
 class RequestList(APIView):
     def get(self, request, subdivision=None):
@@ -19,7 +20,18 @@ class RequestList(APIView):
         
             requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True)
         else:
-            requests = Request.objects.filter(processed_by_logistician=True).order_by('date_type_quantity_plannedWorkTime_machinery')
+            # Функция для извлечения минимальной даты
+            def get_min_date(request_obj):
+                dates = [
+                    datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S')  # Укажите формат даты
+                    for entry in request_obj.date_type_quantity_plannedWorkTime_machinery
+                    if 'date' in entry
+                ]
+                return min(dates) if dates else datetime.max
+
+            # Получение и сортировка запросов
+            requests = list(Request.objects.filter(processed_by_logistician=True))
+            requests = sorted(requests, key=get_min_date)
 
         # Преобразуем данные для ответа
         result = []

@@ -22,6 +22,12 @@ const Dashboard = () => {
         loadRequests();
     }, []);
 
+    const navigateToSelect = (dateItem, item, index) => {
+        const request_id = item.id;
+        const dateItem_index = index;
+        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index}); 
+    };
+
     const renderRequestItem = ({ item }) => {
         return (
             <View style={styles.requestItem}>
@@ -30,7 +36,7 @@ const Dashboard = () => {
                 {/* Список с элементами */}
                 <FlatList
                     data={item.date_type_quantity_plannedWorkTime_machinery}
-                    renderItem={({ item: dateItem }) => {
+                    renderItem={({ item: dateItem, index }) => {
                         return (
                             <View style={styles.dateItem}>
                                 <Text>Тип техники: {dateItem.type}</Text>
@@ -42,24 +48,14 @@ const Dashboard = () => {
                                 {dateItem.machinery ? (
                                     <TouchableOpacity
                                         style={styles.confirmButton}
-                                        onPress={() =>
-                                            navigation.navigate('SelectEquipment', {
-                                                requestId: item.id,
-                                                dateItemId: dateItem.id,
-                                            })
-                                        }
+                                        onPress={() => navigateToSelect(dateItem, item, index)}
                                     >
                                         <Text style={styles.buttonText}>Изменить выбор а/м</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <TouchableOpacity
                                         style={styles.selectButton}
-                                        onPress={() =>
-                                            navigation.navigate('SelectEquipment', {
-                                                requestId: item.id,
-                                                dateItemId: dateItem.id,
-                                            })
-                                        }
+                                        onPress={() => navigateToSelect(dateItem, item, index)}
                                     >
                                         <Text style={styles.buttonText}>Добавить ТС</Text>
                                     </TouchableOpacity>

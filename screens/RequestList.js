@@ -41,7 +41,13 @@ const RequestList = ({ navigation }) => {
     const navigateToEdit = (dateItem, item, index) => {
         const request_id = item.id;
         const dateItem_index = index;
-        navigation.navigate('EditRequest', { dateItem, request_id,  dateItem_index}); 
+        navigation.navigate('EditRequest', { dateItem, request_id, dateItem_index}); 
+    };
+
+    const navigateToSelect = (dateItem, item, index) => {
+        const request_id = item.id;
+        const dateItem_index = index;
+        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index}); 
     };
 
     const handleSendRequests = async () => {
@@ -69,7 +75,7 @@ const RequestList = ({ navigation }) => {
                             <Text>Количество: {dateItem.quantity} шт.</Text>
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
-                            <Text>Номера а/м: </Text>
+                            <Text>Номера а/м: {dateItem.machinery}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <View style={styles.buttonRow}>
                                 <TouchableOpacity
@@ -80,7 +86,7 @@ const RequestList = ({ navigation }) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.addnumberbutton]}
-                                    onPress={() => navigation.navigate('SelectEquipment')}
+                                    onPress={() => navigateToSelect(dateItem, item, index)}
                                 >
                                     <Text style={styles.buttonText}>Добавить номера</Text>
                                 </TouchableOpacity>

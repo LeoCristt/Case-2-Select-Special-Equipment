@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
-import { fetchMachineries } from '../services/api';
+import { fetchMachineries, patchRequest_edit } from '../services/api';
+import { AuthContext } from '../services/AuthContext';
 
-const SelectEquipment = ({ navigation }) => {
+const SelectEquipment = ({ route, navigation }) => {
+    const { dateItem, request_id, dateItem_index } = route.params;
     const { token, decodedToken } = useContext(AuthContext);
     // Примерные данные для транспортных средств
     const [equipmentList, setEquipmentList] = useState([]);
@@ -11,8 +13,18 @@ const SelectEquipment = ({ navigation }) => {
     useEffect(() => {
         const loadRequests = async () => {
             try {
-                const fetchedRequests = await fetchMachineries();
-                setEquipmentList(fetchedRequests);
+                const fetchedMachineries = await fetchMachineries();
+
+                if (decodedToken.role === "logistician"){
+                    const filteredMachineries = fetchedMachineries.filter(machinery => 
+                        machinery.subdivision === decodedToken.subdivision // Укажите ваше условие
+                    );
+    
+                    setEquipmentList(filteredMachineries);
+                }
+                else{
+                    setEquipmentList(fetchedMachineries);
+                }
             } catch (error) {
                 console.error('Ошибка при загрузке заявок:', error);
             }
@@ -24,8 +36,15 @@ const SelectEquipment = ({ navigation }) => {
     const renderEquipmentItem = ({ item }) => (
         <TouchableOpacity
             style={styles.equipmentItem}
-            onPress={() => {
-                navigation.navigate('Dashboard');
+            onPress={async () => {
+                await patchRequest_edit({"date": dateItem.date, "plannedWorkTime": dateItem.plannedWorkTime, "quantity": dateItem.quantity, "type": dateItem.type, "machinery": item.license_plate}, request_id, dateItem_index)
+
+                if (decodedToken.role === "dispatcher"){
+                    navigation.navigate('Dashboard');
+                }
+                else{
+                    navigation.navigate('RequestList');
+                }
             }}
         >
             <Text>{item.license_plate} - {item.type} - {item.subdivision}</Text>
