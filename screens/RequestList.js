@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
 import { fetchRequests, sendRequests } from '../services/api';
-import { AuthContext } from '../services/AuthContext'; 
+import { AuthContext } from '../services/AuthContext';
 
 const RequestList = ({ navigation }) => {
     const [requests, setRequests] = useState([]);
@@ -69,13 +69,22 @@ const RequestList = ({ navigation }) => {
                             <Text>Количество: {dateItem.quantity} шт.</Text>
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
+                            <Text>Номера а/м: </Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
-                            <TouchableOpacity
-                                style={styles.editButton} 
-                                onPress={() => navigateToEdit(dateItem, item, index)} 
-                            >
-                                <Text style={styles.buttonText}>Редактировать</Text>
-                            </TouchableOpacity>
+                            <View style={styles.buttonRow}>
+                                <TouchableOpacity
+                                    style={[styles.editButton]}
+                                    onPress={() => navigateToEdit(dateItem, item, index)}
+                                >
+                                    <Text style={styles.buttonText}>Редактировать</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.addnumberbutton]}
+                                    onPress={() => navigation.navigate('SelectEquipment')}
+                                >
+                                    <Text style={styles.buttonText}>Добавить номера</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     )}
                     keyExtractor={(dateItem, index) => index.toString()}
@@ -83,10 +92,10 @@ const RequestList = ({ navigation }) => {
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    style={styles.addButton} 
+                    style={styles.addButton}
                     onPress={() => navigateToDetail(item)}
                 >
-                    <Text style={styles.buttonText}>Добавить а/м</Text>
+                    <Text style={styles.buttonText}>Добавить новую технику</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -134,18 +143,33 @@ const styles = StyleSheet.create({
     dateItem: {
         marginBottom: 10,
     },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
     editButton: {
-        backgroundColor: '#6c757d', 
-        padding: 8, 
+        backgroundColor: '#6c757d',
+        padding: 8,
+        borderRadius: 5,
+        marginRight: 5,
+        height: 40,
+        width: 150,
+        height: 40,
+        alignSelf: 'flex-start',
+    },
+    addnumberbutton: {
+        backgroundColor: '#28a745',
+        padding: 8,
         borderRadius: 5,
         flex: 1,
         marginRight: 5,
-        width: 150, 
+        width: 150,
         height: 40,
         alignSelf: 'flex-start',
     },
     addButton: {
-        backgroundColor: '#007BFF', 
+        backgroundColor: '#007BFF',
         padding: 10,
         borderRadius: 5,
         flex: 1,
@@ -164,13 +188,13 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         flex: 1,
-        marginRight: 5, 
+        marginRight: 5,
     },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
-        
+
     },
 });
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
 import { fetchMachineries } from '../services/api';
 
 const SelectEquipment = ({ navigation }) => {
+    const { token, decodedToken } = useContext(AuthContext);
     // Примерные данные для транспортных средств
     const [equipmentList, setEquipmentList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +46,7 @@ const SelectEquipment = ({ navigation }) => {
                 renderItem={renderEquipmentItem}
                 contentContainerStyle={styles.list}
             />
+            {(decodedToken.role === "dispatcher" || decodedToken.role === "admin") && (
             <View style={styles.noEquipmentContainer}>
                 <Text style={styles.noEquipmentText}>Если вы не нашли необходимую технику.</Text>
                 <Button
@@ -54,7 +56,7 @@ const SelectEquipment = ({ navigation }) => {
                     }}
                 />
             </View>
-
+            )}
         </View>
     );
 };
