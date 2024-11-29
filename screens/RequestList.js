@@ -74,7 +74,6 @@ const RequestList = ({ navigation }) => {
                             <Text>Количество: {dateItem.quantity} шт.</Text>
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
-                            <Text>Машины: {JSON.stringify(dateItem.machinery)}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <View style={styles.machineryListContainer}>
                                 {Array.from({ length: dateItem.quantity }).map((_, machinery_index) => (

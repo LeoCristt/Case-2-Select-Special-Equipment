@@ -14,17 +14,19 @@ const SelectEquipment = ({ route, navigation }) => {
         const loadRequests = async () => {
             try {
                 const fetchedMachineries = await fetchMachineries();
+                let filteredMachineries;
 
                 if (decodedToken.role === "logistician"){
-                    const filteredMachineries = fetchedMachineries.filter(machinery => 
+                    filteredMachineries = fetchedMachineries.filter(machinery => 
                         machinery.subdivision === decodedToken.subdivision // Укажите ваше условие
                     );
-    
-                    setEquipmentList(filteredMachineries);
                 }
                 else{
-                    setEquipmentList(fetchedMachineries);
+                    filteredMachineries = fetchedMachineries.filter(machinery => 
+                        machinery.type === dateItem.type // Укажите ваше условие
+                    );
                 }
+                setEquipmentList(filteredMachineries);
             } catch (error) {
                 console.error('Ошибка при загрузке заявок:', error);
             }

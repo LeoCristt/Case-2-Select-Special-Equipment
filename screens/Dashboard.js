@@ -29,10 +29,9 @@ const Dashboard = () => {
         }
     };
 
-    const navigateToSelect = (dateItem, item, index) => {
+    const navigateToSelect = (dateItem, item, dateItem_index, machinery_index) => {
         const request_id = item.id;
-        const dateItem_index = index;
-        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index}); 
+        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index, machinery_index }); 
     };
 
     const handleCreateRouteSheet = (item, dateItem, machineIndex) => {
@@ -43,8 +42,7 @@ const Dashboard = () => {
             plannedDepartureTime: dateItem.plannedDepartureTime,
             plannedArrivalTime: dateItem.date,
             plannedWorkTime: dateItem.plannedWorkTime,
-            vehicleRegistrationNumber: dateItem.machinery,
-            machineIndex: machineIndex + 1, 
+            vehicleRegistrationNumber: dateItem.machinery[machineIndex + 1]
         };
     
         navigation.navigate('RouteSheet', { request: machineData }); // Передаем данные
@@ -82,19 +80,19 @@ const Dashboard = () => {
                                 <Text>Плановое время работы на объекте: {dateItem.plannedWorkTime} часа</Text>
                                 
     
-                                {Array.from({ length: dateItem.quantity }).map((_, machineIndex) => {
+                                {Array.from({ length: dateItem.quantity, index }).map((_, machineIndex) => {
                                     const machineryAssigned = !!dateItem.machinery; // Проверка, назначен ли номер
                                     return (
                                         <View style={styles.machineBlock} key={machineIndex}>
                                             <Text>
                                                 Машина {machineIndex + 1}: Госномер{' '}
-                                                {machineryAssigned ? dateItem.machinery : 'Не назначен'}
+                                                {machineryAssigned ? dateItem.machinery[machineIndex + 1] : 'Не назначен'}
                                             </Text>
     
                                             <TouchableOpacity
                                                 style={styles.selectButton}
                                                 onPress={() =>
-                                                    navigateToSelect(dateItem, item, index)
+                                                    navigateToSelect(dateItem, item, index, machineIndex + 1)
                                                 }
                                             >
                                                 <Text style={styles.buttonText}>
