@@ -30,7 +30,7 @@ class RequestList(APIView):
                 return min(dates) if dates else datetime.max
 
             # Получение и сортировка запросов
-            requests = list(Request.objects.filter(processed_by_logistician=True))
+            requests = list(Request.objects.filter(processed_by_logistician=True).exclude(closed=True))
             requests = sorted(requests, key=get_min_date)
 
         # Преобразуем данные для ответа
@@ -100,8 +100,11 @@ class RequestList(APIView):
 
             if isinstance(existing_data[list_index].get("machinery"), dict) and isinstance(new_machinery, dict):
                 # Объединяем ключи/значения
+                # Обновить все поля, кроме machinery
+                current_machinery = existing_data[list_index].get("machinery", {})
+                existing_data[list_index].update(new_data)  # Обновить остальные поля
+                existing_data[list_index]["machinery"] = current_machinery  # Вернуть machinery на место
                 existing_data[list_index]["machinery"].update(new_machinery)
-                print(existing_data[list_index]["machinery"])
             else:
                 # Если это не словари, заменяем старые данные новыми
                 existing_data[list_index]["machinery"] = new_machinery
@@ -111,7 +114,26 @@ class RequestList(APIView):
         request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data
         request_instance.save()
 
-        return Response({"success": "Entry added successfully", "updated_data": existing_data}, status=status.HTTP_200_OK)
+        return Response({"success": "Entry added successfully"}, status=status.HTTP_200_OK)
+    
+    def delete(self, request, pk=None, list_index=None, machinery_index=None):
+        try:
+            request_instance = Request.objects.get(pk=pk)
+        except Request.DoesNotExist:
+            return Response({"error": f"Request with id {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        existing_data = request_instance.date_type_quantity_plannedWorkTime_machinery or []
+        
+        try:
+            # Удаляем элемент
+            existing_data[list_index]["machinery"].pop(f"{machinery_index}")
+        except (IndexError, KeyError):
+            return Response({"error": "Invalid index provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data
+        request_instance.save()
+
+        return Response({"success": "Успешно удалено."}, status=status.HTTP_200_OK)
 
 
 class SubdivisionList(APIView):
@@ -134,6 +156,11 @@ class MachineryList(APIView):
         return Response(serializer.data)
     
 class WaybillList(APIView):
+    def get(self, request):
+        waybills = Waybill.objects.all().filter(closed=False)
+        serializer = WaybillSerializer(waybills, many=True)
+        return Response(serializer.data)
+
     def post(self, request):
         data = request.data.copy()
 
@@ -183,6 +210,10 @@ class WaybillList(APIView):
                     for machine_id in machines_to_delete:
                         del date_item["machinery"][machine_id]
 
+                    # Проверка, если количество оставшихся машин в словаре равно quantity
+                    if len(date_item["machinery"]) == int(date_item["quantity"]):
+                        request_instance.closed = True
+
             # Сохраняем обновленные данные для текущего запроса
             request_instance.date_type_quantity_plannedWorkTime_machinery = machinery_data
             request_instance.save()
@@ -197,6 +228,22 @@ class WaybillList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, pk=None):
+        try:
+            # Получаем объект по первичному ключу (pk)
+            waybill_instance = Waybill.objects.get(pk=pk)
+        except Request.DoesNotExist:
+            return Response({"error": f"Waybill with id {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        waybill_instance.actual_time_of_departure = request.data['actual_time_of_departure']
+        waybill_instance.actual_time_of_arrival_at_the_facility = request.data['actual_time_of_arrival_at_the_facility']
+        waybill_instance.actual_time_of_work_at_the_facility = request.data['actual_time_of_work_at_the_facility']
+        waybill_instance.actual_time_of_waiting_at_the_facility = request.data['actual_time_of_waiting_at_the_facility']
+        waybill_instance.closed = True
+        waybill_instance.save()
+        return Response({"success": "Успешно изменено."}, status=status.HTTP_200_OK)
+
 
 # Создаем новый сериализатор для получения токенов с дополнительными данными
 class CustomTokenObtainPairSerializer(serializers.Serializer):

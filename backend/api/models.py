@@ -53,6 +53,7 @@ class Request(models.Model):
     master = models.ForeignKey(Master, on_delete=models.SET_NULL, null=True)
     date_type_quantity_plannedWorkTime_machinery = models.JSONField()
     processed_by_logistician = models.BooleanField(default=False)
+    closed = models.BooleanField(default=False)
 
 class Waybill(models.Model):
     machinery = models.ForeignKey(Machinery, on_delete=models.SET_NULL, null=True)
@@ -62,8 +63,8 @@ class Waybill(models.Model):
     planned_time_of_work_at_the_facility = models.PositiveIntegerField()
     actual_time_of_departure = models.DateTimeField(null=True, blank=True)
     actual_time_of_arrival_at_the_facility = models.DateTimeField(null=True, blank=True)
-    actual_time_of_work_at_the_facility = models.DateTimeField(null=True, blank=True)
-    actual_time_of_waiting_at_the_facility = models.DateTimeField(null=True, blank=True)
+    actual_time_of_work_at_the_facility = models.PositiveIntegerField(null=True, blank=True)
+    actual_time_of_waiting_at_the_facility = models.PositiveIntegerField(null=True, blank=True)
     closed = models.BooleanField(default=False)
 
 from django.contrib.auth.models import BaseUserManager
@@ -95,6 +96,7 @@ class CustomUser(AbstractUser):
         ('master', 'Мастер бригады'),
         ('logistician', 'Логист'),
         ('dispatcher', 'Центральный диспетчер'),
+        ('subdivision_manager', 'Руководство подразделения'),
         ('admin', 'Администратор'),
     )
     

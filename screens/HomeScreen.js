@@ -35,6 +35,14 @@ const HomeScreen = ({ navigation }) => {
                             <Text style={styles.buttonText}>Рабочий стол</Text>
                         </TouchableOpacity>
                     )}
+                    {(decodedToken.role === "dispatcher" || decodedToken.role === "admin") && (
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => navigation.navigate('Waybills')}
+                        >
+                            <Text style={styles.buttonText}>Путевые листы</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         </View>

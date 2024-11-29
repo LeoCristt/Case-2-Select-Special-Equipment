@@ -24,10 +24,11 @@ const EditRequest = ({ route, navigation }) => {
         try {
             await patchRequest_edit(
                 {
-                    date,
-                    plannedWorkTime,
-                    quantity,
-                    type,
+                    "date": date,
+                    "plannedWorkTime": plannedWorkTime,
+                    "quantity": quantity,
+                    "type": type,
+                    "machinery": {}
                 },
                 request_id,
                 dateItem_index

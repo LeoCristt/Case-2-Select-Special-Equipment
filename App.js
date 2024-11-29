@@ -15,6 +15,8 @@ import RouteSheet from './screens/RouteSheet';
 import SignIn from './screens/SignIn';
 import Profile from './screens/Profile';
 import OrderEquipment from './screens/OrderEquipment';
+import Waybills from './screens/Waybills';
+import EditWaybill from './screens/EditWaybill';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -31,6 +33,8 @@ const RequestStack = () => {
             <Stack.Screen name="SelectEquipment" component={SelectEquipment} options={{ title: 'Выбор а/м' }} />
             <Stack.Screen name="OrderEquipment" component={OrderEquipment} options={{ title: 'Заказ а/м у контрагента' }} />
             <Stack.Screen name="RouteSheet" component={RouteSheet} options={{ title: 'Путевой лист' }} />
+            <Stack.Screen name="Waybills" component={Waybills} options={{ title: 'Список путевых листов' }} />
+            <Stack.Screen name="EditWaybill" component={EditWaybill} options={{ title: 'Изменение путевого листа' }} />
         </Stack.Navigator>
     );
 };

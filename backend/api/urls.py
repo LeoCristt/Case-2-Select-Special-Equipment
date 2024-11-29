@@ -7,6 +7,7 @@ urlpatterns = [
     path('request/<int:pk>/', RequestList.as_view(), name='request-detail'),
     path('request/<int:pk>/<int:list_index>/', RequestList.as_view(), name='request-edit'),
     path('request/<str:subdivision>/', RequestList.as_view(), name='request-subdivision'),
+    path('request/<int:pk>/<int:list_index>/<int:machinery_index>/', RequestList.as_view(), name='request-machinery-delete'),
 
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Используем кастомный токен
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -18,4 +19,5 @@ urlpatterns = [
     path('machinery/', MachineryList.as_view(), name='machinery-list'),
 
     path('waybill/', WaybillList.as_view(), name='waybill-list'),
+    path('waybill/<int:pk>/', WaybillList.as_view(), name='waybill-edit'),
 ]

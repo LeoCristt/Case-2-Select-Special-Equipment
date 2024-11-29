@@ -30,6 +30,26 @@ export const fetchMachineries = async () => {
     }
 };
 
+export const fetchRouteSheets = async () => {
+    try {
+        const response = await apiClient.get(`/waybill/`);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при получении путевых листов:', error);
+        throw error;
+    }
+};
+
+export const deleteMachinery_fromRequest = async (request_id, dateItem_index, machinery_index) => {
+    try {
+        const response = await apiClient.delete(`/request/${request_id}/${dateItem_index}/${machinery_index}/`);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при удалении машины:', error);
+        throw error;
+    }
+};
+
 export const createRequest = async (requestData) => {
     try {
         const response = await apiClient.post(`/request/`, requestData);
@@ -65,6 +85,16 @@ export const patchRequest_edit = async (requestData, request_id, dateItem_index)
     try {
         const { list_index, ...remainingRequestData } = requestData;
         const response = await apiClient.patch(`/request/${request_id}/${dateItem_index}/`, remainingRequestData);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при изменении заявки:', error);
+        throw error;
+    }
+};
+
+export const updateWaybill = async (requestData, waybill_id) => {
+    try {
+        const response = await apiClient.patch(`/waybill/${waybill_id}/`, requestData);
         return response.data;
     } catch (error) {
         console.error('Ошибка при изменении заявки:', error);

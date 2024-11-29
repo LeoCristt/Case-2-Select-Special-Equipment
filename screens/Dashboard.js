@@ -63,7 +63,6 @@ const Dashboard = () => {
         return (
             <View style={styles.requestItem}>
                 <Text style={styles.header}>Заявка: {item.master.name}</Text>
-                <Text style={styles.subHeader}>Подразделение: {item.master.subdivision}</Text>
                 <Text style={styles.subHeader}>Объект: {item.master.facility}</Text>
     
                 {/* Кнопка для открытия/закрытия подробностей */}

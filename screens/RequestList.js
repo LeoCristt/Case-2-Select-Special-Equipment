@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
-import { fetchRequests, sendRequests } from '../services/api';
+import { fetchRequests, sendRequests, deleteMachinery_fromRequest } from '../services/api';
 import { AuthContext } from '../services/AuthContext';
 
 const RequestList = ({ navigation }) => {
@@ -69,14 +69,17 @@ const RequestList = ({ navigation }) => {
                                         <Text style={styles.machineryLabel}>
                                             Номер машины {machinery_index + 1}:
                                         </Text>
-                                        {dateItem.machinery[machinery_index] ? (
+                                        {dateItem.machinery[machinery_index + 1] ? (
                                             <View style={styles.machineryAssigned}>
                                                 <Text style={styles.machineryNumber}>
-                                                    {dateItem.machinery[machinery_index]}
+                                                    {dateItem.machinery[machinery_index + 1]}
                                                 </Text>
                                                 <TouchableOpacity
                                                     style={styles.removeButton}
-                                                    onPress={() => navigateToSelect(dateItem, item, index, machinery_index)}
+                                                    onPress={() => {
+                                                        deleteMachinery_fromRequest(item.id, index, machinery_index + 1);
+                                                        navigation.push('RequestList');
+                                                      }}
                                                 >
                                                     <Text style={styles.buttonText}>✖</Text>
                                                 </TouchableOpacity>
@@ -85,7 +88,7 @@ const RequestList = ({ navigation }) => {
                                             <TouchableOpacity
                                                 style={styles.addNumberButton}
                                                 onPress={() =>
-                                                    navigateToSelect(dateItem, item, index, machinery_index)
+                                                    navigateToSelect(dateItem, item, index, machinery_index + 1)
                                                 }
                                             >
                                                 <Text style={styles.buttonText}>Добавить номер</Text>

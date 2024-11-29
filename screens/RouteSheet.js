@@ -12,7 +12,7 @@ const RouteSheet = ({ route, navigation }) => {
         // Например, отправка данных на сервер или сохранение в состоянии
         await createWaybill({"machinery": request.vehicleRegistrationNumber, "facility": request.facility, "planned_time_of_departure": plannedDepartureTime + ":00", "planned_time_of_arrival_at_the_facility": request.plannedArrivalTime, "planned_time_of_work_at_the_facility": request.plannedWorkTime, "dateItem_index": request.dateItem_index, "machineIndex": request.machineIndex, "requestId": request.requestId});
         alert(`Путевой лист создан успешно! Время выезда: ${plannedDepartureTime}`);
-        navigation.goBack(); // Возвращаемся на предыдущий экран
+        navigation.navigate("Dashboard"); // Возвращаемся на предыдущий экран
     };
 
     return (
