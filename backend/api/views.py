@@ -97,7 +97,15 @@ class RequestList(APIView):
         if list_index == None:
             existing_data.append(new_data)
         else:
-            existing_data[list_index] = new_data
+            new_machinery = new_data.get("machinery")
+
+            if isinstance(existing_data[list_index].get("machinery"), dict) and isinstance(new_machinery, dict):
+                # Объединяем ключи/значения
+                existing_data[list_index]["machinery"].update(new_machinery)
+            else:
+                # Если это не словари, заменяем старые данные новыми
+                existing_data[list_index]["machinery"] = new_machinery
+
 
         # Обновляем поле модели
         request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data

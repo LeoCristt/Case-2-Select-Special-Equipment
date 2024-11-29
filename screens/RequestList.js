@@ -44,10 +44,9 @@ const RequestList = ({ navigation }) => {
         navigation.navigate('EditRequest', { dateItem, request_id, dateItem_index }); 
     };
 
-    const navigateToSelect = (dateItem, item, index) => {
+    const navigateToSelect = (dateItem, item, dateItem_index, machinery_index) => {
         const request_id = item.id;
-        const dateItem_index = index;
-        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index }); 
+        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index, machinery_index }); 
     };
 
     const handleSendRequests = async () => {
@@ -75,14 +74,15 @@ const RequestList = ({ navigation }) => {
                             <Text>Количество: {dateItem.quantity} шт.</Text>
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
+                            <Text>Машины: {JSON.stringify(dateItem.machinery)}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <View style={styles.machineryListContainer}>
-                                {Array.from({ length: dateItem.quantity }).map((_, idx) => (
-                                    <View style={styles.machineryItem} key={idx}>
-                                        <Text style={styles.machineryNumber}>Номер Машины {idx + 1}</Text>
+                                {Array.from({ length: dateItem.quantity }).map((_, machinery_index) => (
+                                    <View style={styles.machineryItem} key={machinery_index}>
+                                        <Text style={styles.machineryNumber}>Номер Машины {machinery_index + 1} {dateItem.machinery[machinery_index + 1]}</Text>
                                         <TouchableOpacity
                                             style={styles.addNumberButton}
-                                            onPress={() => navigateToSelect(dateItem, item, index)}
+                                            onPress={() => navigateToSelect(dateItem, item, index, machinery_index + 1)}
                                         >
                                             <Text style={styles.buttonText}>Добавить номер</Text>
                                         </TouchableOpacity>

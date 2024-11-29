@@ -4,7 +4,7 @@ import { fetchMachineries, patchRequest_edit } from '../services/api';
 import { AuthContext } from '../services/AuthContext';
 
 const SelectEquipment = ({ route, navigation }) => {
-    const { dateItem, request_id, dateItem_index } = route.params;
+    const { dateItem, request_id, dateItem_index, machinery_index } = route.params;
     const { token, decodedToken } = useContext(AuthContext);
     // Примерные данные для транспортных средств
     const [equipmentList, setEquipmentList] = useState([]);
@@ -37,7 +37,7 @@ const SelectEquipment = ({ route, navigation }) => {
         <TouchableOpacity
             style={styles.equipmentItem}
             onPress={async () => {
-                await patchRequest_edit({"date": dateItem.date, "plannedWorkTime": dateItem.plannedWorkTime, "quantity": dateItem.quantity, "type": dateItem.type, "machinery": item.license_plate}, request_id, dateItem_index)
+                await patchRequest_edit({"date": dateItem.date, "plannedWorkTime": dateItem.plannedWorkTime, "quantity": dateItem.quantity, "type": dateItem.type, "machinery": { [machinery_index]: item.license_plate}}, request_id, dateItem_index)
 
                 if (decodedToken.role === "dispatcher"){
                     navigation.navigate('Dashboard');
