@@ -8,6 +8,7 @@ from rest_framework import serializers
 from .models import CustomUser, Subdivision, Master, Machinery, Waybill
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from datetime import datetime
 
 class RequestList(APIView):
     def get(self, request, subdivision=None):
@@ -17,9 +18,20 @@ class RequestList(APIView):
             except Subdivision.DoesNotExist:
                 return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
         
-            requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True)
+            requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True).order_by('-id')
         else:
-            requests = Request.objects.filter(processed_by_logistician=True).order_by('date_type_quantity_plannedWorkTime_machinery')
+            # Функция для извлечения минимальной даты
+            def get_min_date(request_obj):
+                dates = [
+                    datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S')  # Укажите формат даты
+                    for entry in request_obj.date_type_quantity_plannedWorkTime_machinery
+                    if 'date' in entry
+                ]
+                return min(dates) if dates else datetime.max
+
+            # Получение и сортировка запросов
+            requests = list(Request.objects.filter(processed_by_logistician=True))
+            requests = sorted(requests, key=get_min_date)
 
         # Преобразуем данные для ответа
         result = []
@@ -34,7 +46,6 @@ class RequestList(APIView):
                 "distance": request_obj.distance,
                 "processed_by_logistician": request_obj.processed_by_logistician,
                 "date_type_quantity_plannedWorkTime_machinery": request_obj.date_type_quantity_plannedWorkTime_machinery,
-
             }
 
             result.append(request_data)
@@ -85,7 +96,16 @@ class RequestList(APIView):
         if list_index == None:
             existing_data.append(new_data)
         else:
-            existing_data[list_index] = new_data
+            new_machinery = new_data.get("machinery")
+
+            if isinstance(existing_data[list_index].get("machinery"), dict) and isinstance(new_machinery, dict):
+                # Объединяем ключи/значения
+                existing_data[list_index]["machinery"].update(new_machinery)
+                print(existing_data[list_index]["machinery"])
+            else:
+                # Если это не словари, заменяем старые данные новыми
+                existing_data[list_index]["machinery"] = new_machinery
+
 
         # Обновляем поле модели
         request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data

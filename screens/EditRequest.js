@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { patchRequest_edit } from '../services/api';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { TextInputMask } from 'react-native-masked-text';
 
 const EditRequest = ({ route, navigation }) => {
     const { dateItem, request_id, dateItem_index } = route.params;
@@ -21,7 +22,7 @@ const EditRequest = ({ route, navigation }) => {
 
     const handleSave = async () => {
         await patchRequest_edit({"date": date, "plannedWorkTime": plannedWorkTime, "quantity": quantity, "type": type}, request_id, dateItem_index)
-        navigation.navigate('RequestList'); 
+        navigation.navigate('RequestList');
     };
 
     return (
@@ -55,11 +56,13 @@ const EditRequest = ({ route, navigation }) => {
                     onChangeText={setPlannedWorkTime}
                 />
                 <Text style={styles.label}>Время подачи:</Text>
-                <TextInput
+                <TextInputMask
+                    type={'datetime'}
+                    options={{
+                        format: 'YYYY-MM-DD HH:MM',  
+                    }}
                     style={styles.input}
-                    placeholder="Время подачи"
-                    value={date}
-                    onChangeText={setDate}
+                    placeholder="Введите дату и время"
                 />
                 <View style={styles.buttonContainer}>
                     <Button title="Сохранить изменения" onPress={handleSave} />

@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { patchRequest } from '../services/api';
 import { TextInputMask } from 'react-native-masked-text';
-import { KeyboardAvoidingView } from 'react-native';
-import { Platform } from 'react-native';
-import { ScrollView } from 'react-native';
 
 const RequestDetail = ({ route, navigation }) => {
     const { request } = route.params;
@@ -15,7 +12,7 @@ const RequestDetail = ({ route, navigation }) => {
 
     const addEquipment = () => {
         if ([type, quantity, plannedWorkTime, date].every(Boolean)) {
-            patchRequest({ id: request.id, date: date, type: type, quantity: quantity, plannedWorkTime: plannedWorkTime });
+            patchRequest({ id: request.id, date: date + ":00", type: type, quantity: quantity, plannedWorkTime: plannedWorkTime });
             console.log(`Добавлено новое оборудование: ${type}, Количество: ${quantity}, Время работы: ${plannedWorkTime}, Дата: ${date}`);
             setType('');
             setQuantity('');

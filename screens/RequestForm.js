@@ -72,6 +72,7 @@ const RequestForm = ({ navigation }) => {
                 quantity: slot.quantity,
                 plannedWorkTime: slot.plannedWorkTime,
                 date: slot.date + ":00",  // Добавляем секунды
+                machinery: {}
             }));
 
             const { type, quantity, plannedWorkTime, ...remainingRequestData } = requestData;
