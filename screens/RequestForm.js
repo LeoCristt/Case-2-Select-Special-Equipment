@@ -86,8 +86,8 @@ const RequestForm = ({ navigation }) => {
 
     const renderDateSlot = (item) => (
         < View style={styles.dateSlot} key={item.date}>
-            <Text>{item.date} - {item.endTime}</Text>
-            <Text style={styles.infoText}>Тип: {item.type}, Количество: {item.quantity}, Плановое время работы: {item.plannedWorkTime}</Text>
+            <Text style={styles.slotText}>{item.date} - {item.endTime}</Text>
+            <Text style={styles.slotInfoText}>Тип: {item.type}, Количество: {item.quantity}, Плановое время работы: {item.plannedWorkTime}</Text>
         </View>
     );
 
@@ -137,6 +137,7 @@ const RequestForm = ({ navigation }) => {
                     title="Добавить временной слот" 
                     onPress={addDateSlot} 
                     disabled={!isFormValid() || !newDateSlot} 
+                    color="#6E473B"
                 />
 
                 <Text style={styles.label}>Добавленные временные слоты:</Text>
@@ -146,6 +147,7 @@ const RequestForm = ({ navigation }) => {
                     title="Отправить заявку" 
                     onPress={handleSubmit} 
                     disabled={dateSlots.length === 0} 
+                    color="#6E473B"
                 />
             </ScrollView>
         </KeyboardAvoidingView>
@@ -156,7 +158,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#E1D4C2', 
     },
     scrollView: {
         flexGrow: 1,
@@ -165,25 +167,33 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
+        color: '#6E473B', 
         marginBottom: 5,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#BEB5A9',
         borderRadius: 5,
         padding: 10,
         marginBottom: 15,
+        backgroundColor: '#fff',
     },
     dateSlot: {
         padding: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#BEB5A9',
         borderRadius: 5,
         marginBottom: 10,
+        backgroundColor: '#fff',
     },
-    infoText: {
+    slotText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#6E473B', 
+    },
+    slotInfoText: {
         fontSize: 14,
-        color: '#555',
+        color: '#555', 
     },
 });
 
