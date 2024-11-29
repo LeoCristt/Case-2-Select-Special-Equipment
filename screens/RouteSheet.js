@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet,TextInput, ScrollView } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text';
+import { createWaybill } from '../services/api';
 
 const RouteSheet = ({ route, navigation }) => {
     const { request } = route.params; // Получаем данные заявки
     const [plannedDepartureTime, setPlannedDepartureTime] = useState(''); // Состояние для ввода времени
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         // Логика для создания путевого листа
         // Например, отправка данных на сервер или сохранение в состоянии
+        await createWaybill({"machinery": request.vehicleRegistrationNumber, "facility": request.facility, "planned_time_of_departure": plannedDepartureTime + ":00", "planned_time_of_arrival_at_the_facility": request.plannedArrivalTime, "planned_time_of_work_at_the_facility": request.plannedWorkTime, "dateItem_index": request.dateItem_index, "machineIndex": request.machineIndex, "requestId": request.requestId});
         alert(`Путевой лист создан успешно! Время выезда: ${plannedDepartureTime}`);
         navigation.goBack(); // Возвращаемся на предыдущий экран
     };
@@ -45,6 +47,7 @@ const RouteSheet = ({ route, navigation }) => {
                     options={{
                         format: 'YYYY-MM-DD HH:MM',  
                     }}
+                    value={plannedDepartureTime}
                     onChangeText={setPlannedDepartureTime}
                     style={styles.input}
                     placeholder="Введите дату и время"

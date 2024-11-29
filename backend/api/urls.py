@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RequestList, SubdivisionList, MasterList, MachineryList, CustomTokenObtainPairView  # Импортируем кастомное представление
+from .views import RequestList, SubdivisionList, MasterList, MachineryList, WaybillList, CustomTokenObtainPairView  # Импортируем кастомное представление
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -16,4 +16,6 @@ urlpatterns = [
     path('master/', MasterList.as_view(), name='master-list'),
 
     path('machinery/', MachineryList.as_view(), name='machinery-list'),
+
+    path('waybill/', WaybillList.as_view(), name='waybill-list'),
 ]

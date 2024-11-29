@@ -59,7 +59,7 @@ class Waybill(models.Model):
     facility = models.ForeignKey(Facility, on_delete=models.SET_NULL, null=True)
     planned_time_of_departure = models.DateTimeField()
     planned_time_of_arrival_at_the_facility = models.DateTimeField()
-    planned_time_of_work_at_the_facility = models.DateTimeField()
+    planned_time_of_work_at_the_facility = models.PositiveIntegerField()
     actual_time_of_departure = models.DateTimeField(null=True, blank=True)
     actual_time_of_arrival_at_the_facility = models.DateTimeField(null=True, blank=True)
     actual_time_of_work_at_the_facility = models.DateTimeField(null=True, blank=True)

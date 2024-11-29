@@ -2,10 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Request
-from .serializers import RequestSerializer, MachinerySerializer
+from .serializers import RequestSerializer, MachinerySerializer, WaybillSerializer
 from rest_framework.exceptions import NotFound
 from rest_framework import serializers
-from .models import CustomUser, Subdivision, Master, Machinery, Waybill
+from .models import CustomUser, Subdivision, Master, Machinery, Waybill, Facility
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime
@@ -132,6 +132,71 @@ class MachineryList(APIView):
         requests = Machinery.objects.all().exclude(license_plate__in=busy_machineries)
         serializer = MachinerySerializer(requests, many=True)
         return Response(serializer.data)
+    
+class WaybillList(APIView):
+    def post(self, request):
+        data = request.data.copy()
+
+        try:
+            machinery = Machinery.objects.get(license_plate=request.data['machinery'])
+        except Machinery.DoesNotExist:
+            return Response({"error": f"Machinery with license plate {request.data['machinery']} not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        data['machinery'] = machinery.license_plate
+        
+        try:
+            facility = Facility.objects.get(name=request.data['facility'])
+        except Facility.DoesNotExist:
+            return Response({"error": f"Facility with name '{request.data['facility']}' does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        
+        data['facility'] = facility.name
+
+        requests = Request.objects.all()
+
+        for request_instance in requests:
+            # Получаем данные машины для текущего запроса
+            machinery_data = request_instance.date_type_quantity_plannedWorkTime_machinery or []
+
+            for index, date_item in enumerate(machinery_data):
+                if "machinery" in date_item and isinstance(date_item["machinery"], dict):
+                    # Список машин, которые нужно удалить
+                    machines_to_delete = []
+
+                    # Перебираем словарь машин с использованием list() для безопасного удаления
+                    for machine_id, license_plate in list(date_item["machinery"].items()):
+                        # Пропускаем удаление, если:
+                        # - Текущий request_instance.id равен data["requestId"]
+                        # - Текущий index равен data["dateItem_index"]
+                        # - Текущий machine_id равен data["machineIndex"]
+                        if (
+                            request_instance.id == data["requestId"]
+                            and index == data["dateItem_index"]
+                            and str(machine_id) == str(data["machineIndex"])
+                        ):
+                            continue
+
+                        # Если номер совпадает, добавляем машину в список для удаления
+                        if license_plate == machinery.license_plate:
+                            machines_to_delete.append(machine_id)
+
+                    # Удаляем машины из словаря
+                    for machine_id in machines_to_delete:
+                        del date_item["machinery"][machine_id]
+
+            # Сохраняем обновленные данные для текущего запроса
+            request_instance.date_type_quantity_plannedWorkTime_machinery = machinery_data
+            request_instance.save()
+
+        keys_to_remove = ['dateItem_index', 'requestId', 'machineIndex']
+        for key in keys_to_remove:
+            if key in data:
+                del data[key]
+        
+        serializer = WaybillSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Создаем новый сериализатор для получения токенов с дополнительными данными
 class CustomTokenObtainPairSerializer(serializers.Serializer):

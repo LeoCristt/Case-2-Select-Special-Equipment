@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { fetchRequests_dispatcher } from '../services/api';
+import { fetchRequests_dispatcher, fetchMachineries } from '../services/api';
 import { useNavigation } from '@react-navigation/native';
 
 const Dashboard = () => {
     const [summaryRequests, setSummaryRequests] = useState([]);
     const [expandedRequestIds, setExpandedRequestIds] = useState([]); 
+    const [equipmentList, setEquipmentList] = useState([]);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -13,6 +14,12 @@ const Dashboard = () => {
             try {
                 const fetchedRequests = await fetchRequests_dispatcher();
                 setSummaryRequests(fetchedRequests);
+                const fetchedMachineries = await fetchMachineries();
+                // Извлекаем только license_plate
+                const licensePlates = fetchedMachineries.map(machinery => machinery.license_plate);
+
+                // Устанавливаем массив licensePlates в состояние
+                setEquipmentList(licensePlates);
             } catch (error) {
                 console.error('Ошибка при загрузке заявок:', error);
             }
@@ -34,15 +41,17 @@ const Dashboard = () => {
         navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index, machinery_index }); 
     };
 
-    const handleCreateRouteSheet = (item, dateItem, machineIndex) => {
+    const handleCreateRouteSheet = (item, dateItem, index, machineIndex) => {
         const machineData = {
             requestId: item.id,
+            dateItem_index: index,
             facility: item.master.facility,
             type: dateItem.type,
             plannedDepartureTime: dateItem.plannedDepartureTime,
             plannedArrivalTime: dateItem.date,
             plannedWorkTime: dateItem.plannedWorkTime,
-            vehicleRegistrationNumber: dateItem.machinery[machineIndex + 1]
+            vehicleRegistrationNumber: dateItem.machinery[machineIndex + 1],
+            machineIndex: machineIndex + 1
         };
     
         navigation.navigate('RouteSheet', { request: machineData }); // Передаем данные
@@ -86,36 +95,46 @@ const Dashboard = () => {
                                         <View style={styles.machineBlock} key={machineIndex}>
                                             <Text>
                                                 Машина {machineIndex + 1}: Госномер{' '}
-                                                {machineryAssigned ? dateItem.machinery[machineIndex + 1] : 'Не назначен'}
+                                                {dateItem.machinery[machineIndex + 1] ? dateItem.machinery[machineIndex + 1] : 'Не назначен'}
                                             </Text>
+
     
-                                            <TouchableOpacity
-                                                style={styles.selectButton}
-                                                onPress={() =>
-                                                    navigateToSelect(dateItem, item, index, machineIndex + 1)
-                                                }
-                                            >
-                                                <Text style={styles.buttonText}>
-                                                    {machineryAssigned
-                                                        ? 'Изменить выбор'
-                                                        : 'Добавить номер'}
-                                                </Text>
-                                            </TouchableOpacity>
+                                            {dateItem.machinery[machineIndex + 1] && equipmentList.includes(dateItem.machinery[machineIndex + 1]) ? (
+                                                <TouchableOpacity
+                                                    style={styles.selectButton}
+                                                    onPress={() =>
+                                                        navigateToSelect(dateItem, item, index, machineIndex + 1)
+                                                    }
+                                                >
+                                                    <Text style={styles.buttonText}>
+                                                        {dateItem.machinery[machineIndex + 1] ? 'Изменить выбор' : 'Добавить номер'}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            ) : !dateItem.machinery[machineIndex + 1] && !equipmentList.includes(dateItem.machinery[machineIndex + 1]) ? (
+                                                <TouchableOpacity
+                                                    style={styles.selectButton}
+                                                    onPress={() =>
+                                                        navigateToSelect(dateItem, item, index, machineIndex + 1)
+                                                    }
+                                                >
+                                                    <Text style={styles.buttonText}>Добавить номер</Text>
+                                                </TouchableOpacity>
+                                            ) : null}
     
-                                            <TouchableOpacity
-                                                style={styles.routeSheetButton}
-                                                onPress={() =>
-                                                    handleCreateRouteSheet(
-                                                        item,
-                                                        dateItem,
-                                                        machineIndex
-                                                    )
-                                                }
-                                            >
-                                                <Text style={styles.buttonText}>
-                                                    Создать путевой лист
-                                                </Text>
-                                            </TouchableOpacity>
+                                            {dateItem.machinery[machineIndex + 1] ? (
+                                                equipmentList.includes(dateItem.machinery[machineIndex + 1]) ? (
+                                                    <TouchableOpacity
+                                                        style={styles.routeSheetButton}
+                                                        onPress={() =>
+                                                            handleCreateRouteSheet(item, dateItem, index, machineIndex)
+                                                        }
+                                                    >
+                                                        <Text style={styles.buttonText}>Создать путевой лист</Text>
+                                                    </TouchableOpacity>
+                                                ) : (
+                                                    <Text style={styles.successText}>Путевой лист создан</Text>
+                                                )
+                                            ) : null}
                                         </View>
                                     );
                                 })}

@@ -40,6 +40,16 @@ export const createRequest = async (requestData) => {
     }
 };
 
+export const createWaybill = async (requestData) => {
+    try {
+        const response = await apiClient.post(`/waybill/`, requestData);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при создании заявки:', error);
+        throw error;
+    }
+};
+
 export const patchRequest = async (requestData) => {
     try {
         const { id, ...remainingRequestData } = requestData;
