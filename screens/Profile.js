@@ -1,65 +1,78 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { AuthContext } from '../services/AuthContext'; 
+import { AuthContext } from '../services/AuthContext';
 
 const ProfileScreen = ({ navigation }) => {
     const { token, decodedToken } = useContext(AuthContext);
 
-    // Примерные данные пользователя
     const user = {
         name: decodedToken.username,
-        role: decodedToken.role, // Пример роли
+        role: decodedToken.role,
+        email: decodedToken.email,
     };
 
     const handleLogout = () => {
-        // Логика выхода из аккаунта
         console.log('Выход из аккаунта');
         navigation.reset({
             index: 0,
-            routes: [{ name: 'SignIn' }], // Указываем экран входа как начальный маршрут
+            routes: [{ name: 'SignIn' }],
         });
         // Например, очистка токенов, переход на экран входа и т.д.
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.profileInfo}>
-                <Image
-                    source={getProfileImage(user.role)} // Используем функцию для получения изображения
-                    style={styles.avatar}
-                />
-                <Text style={styles.userName}>{user.name}</Text>
-                <Text style={styles.userRole}>Роль: {user.role}</Text>
-                <Text style={styles.userEmail}>{user.email}</Text>
+        <View style={styles.overlay}>
+            <View style={styles.container}>
+                <View style={styles.profileInfo}>
+                    <Image
+                        source={getProfileImage(user.role)}
+                        style={styles.avatar}
+                    />
+                    <Text style={styles.userName}>Имя: {user.name}</Text>
+                    <Text style={styles.userRole}>Роль: {user.role}</Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={[styles.commonButton, styles.logoutButton]} onPress={handleLogout}>
+                        <Text style={styles.buttonText}>Выйти</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutButtonText}>Выйти</Text>
-            </TouchableOpacity>
         </View>
     );
 };
 
-
 const getProfileImage = (role) => {
     switch (role) {
         case 'dispatcher':
-            return require('../assets/profilelogo/dispatcher.png'); 
+            return require('../assets/profilelogo/dispatcher.png');
         case 'logistician':
-            return require('../assets/profilelogo/logistician.png'); 
+            return require('../assets/profilelogo/logistician.png');
         case 'master':
-            return require('../assets/profilelogo/master.png'); 
+            return require('../assets/profilelogo/master.png');
         case 'admin':
             return require('../assets/profilelogo/admin.png');
         default:
-            return require('../assets/profilelogo/default.png'); 
+            return require('../assets/profilelogo/default.png');
     }
 };
 
 const styles = StyleSheet.create({
-    container: {
+    overlay: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'rgba(41, 28, 14, 0.7)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    container: {
+        width: '90%',
+        backgroundColor: '#E1D4C2',
+        borderRadius: 15,
         padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 10,
     },
     profileInfo: {
         alignItems: 'center',
@@ -70,34 +83,37 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 50,
         borderWidth: 2,
-        borderColor: '#6200ee',
+        borderColor: '#6E473B',  // Using the same accent color
         marginBottom: 10,
     },
     userName: {
         fontSize: 20,
         fontWeight: 'bold',
+        color: '#6E473B',
         marginBottom: 5,
     },
     userRole: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 5,
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#6E473B',
     },
-    userEmail: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 20,
+    buttonContainer: {
+        marginTop: 5,
+    },
+    commonButton: {
+        padding: 12,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     logoutButton: {
         backgroundColor: '#ff3d00',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center',
     },
-    logoutButtonText: {
+    buttonText: {
         color: '#fff',
-        fontSize: 18,
         fontWeight: 'bold',
+        fontSize: 18,
+        textAlign: 'center',
     },
 });
 

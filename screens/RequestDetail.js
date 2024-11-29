@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { patchRequest } from '../services/api';
+import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { TextInputMask } from 'react-native-masked-text';
 
 const RequestDetail = ({ route, navigation }) => {
@@ -29,27 +29,40 @@ const RequestDetail = ({ route, navigation }) => {
             keyboardVerticalOffset={100}
         >
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <View style={styles.container}>
+                <Text style={styles.title}>Добавить новое оборудование</Text>
+                <View style={styles.inputContainer}>
                     <Text style={styles.label}>Тип техники:</Text>
                     <TextInput
                         style={styles.input}
                         value={type}
                         onChangeText={setType}
+                        placeholder="Введите тип техники"
                     />
+                </View>
+
+                <View style={styles.inputContainer}>
                     <Text style={styles.label}>Количество:</Text>
                     <TextInput
                         style={styles.input}
                         keyboardType='numeric'
                         value={quantity}
                         onChangeText={setQuantity}
+                        placeholder="Введите количество"
                     />
+                </View>
+
+                <View style={styles.inputContainer}>
                     <Text style={styles.label}>Плановое время работы:</Text>
                     <TextInput
                         style={styles.input}
                         keyboardType='numeric'
                         value={plannedWorkTime}
                         onChangeText={setPlannedWorkTime}
+                        placeholder="Введите плановое время работы"
                     />
+                </View>
+
+                <View style={styles.inputContainer}>
                     <Text style={styles.label}>Время подачи:</Text>
                     <TextInputMask
                         type={'datetime'}
@@ -59,8 +72,12 @@ const RequestDetail = ({ route, navigation }) => {
                         value={date}
                         onChangeText={setDate}
                         style={styles.input}
+                        placeholder="Введите дату и время"
                     />
-                    <Button title="Добавить" onPress={addEquipment} />
+                </View>
+
+                <View style={styles.buttonContainer}>
+                    <Button title="Добавить" onPress={addEquipment} color="#6E473B" />
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -69,24 +86,41 @@ const RequestDetail = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
-        backgroundColor: '#f8f8f8',
         flex: 1,
+        padding: 20,
+        backgroundColor: '#E1D4C2',
     },
     scrollView: {
-        padding: 20,
-        paddingBottom: 40,
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        paddingBottom: 60,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#6E473B',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    inputContainer: {
+        marginBottom: 15,
     },
     label: {
-        fontSize: 18,
-        marginVertical: 10,
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#6E473B',
+        marginBottom: 8,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#BEB5A9',
         borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        backgroundColor: '#fff',
+    },
+    buttonContainer: {
+        marginTop: 20,
     },
 });
 
