@@ -41,13 +41,13 @@ const RequestList = ({ navigation }) => {
     const navigateToEdit = (dateItem, item, index) => {
         const request_id = item.id;
         const dateItem_index = index;
-        navigation.navigate('EditRequest', { dateItem, request_id, dateItem_index}); 
+        navigation.navigate('EditRequest', { dateItem, request_id, dateItem_index }); 
     };
 
     const navigateToSelect = (dateItem, item, index) => {
         const request_id = item.id;
         const dateItem_index = index;
-        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index}); 
+        navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index }); 
     };
 
     const handleSendRequests = async () => {
@@ -68,27 +68,33 @@ const RequestList = ({ navigation }) => {
             <View style={styles.datesContainer}>
                 <FlatList
                     data={item.date_type_quantity_plannedWorkTime_machinery}
-                    renderItem={({ item: dateItem, index  }) => (
+                    renderItem={({ item: dateItem, index }) => (
                         <View style={styles.dateItem}>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
                             <Text>Тип техники: {dateItem.type}</Text>
                             <Text>Количество: {dateItem.quantity} шт.</Text>
                             <Text>Плановое время работы: {dateItem.plannedWorkTime} часа</Text>
                             <Text>Время подачи: {dateItem.date}</Text>
-                            <Text>Номера а/м: {dateItem.machinery}</Text>
                             <Text style={styles.separator}>-----------------------------------------------------</Text>
+                            <View style={styles.machineryListContainer}>
+                                {Array.from({ length: dateItem.quantity }).map((_, idx) => (
+                                    <View style={styles.machineryItem} key={idx}>
+                                        <Text style={styles.machineryNumber}>Номер Машины {idx + 1}</Text>
+                                        <TouchableOpacity
+                                            style={styles.addNumberButton}
+                                            onPress={() => navigateToSelect(dateItem, item, index)}
+                                        >
+                                            <Text style={styles.buttonText}>Добавить номер</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
                             <View style={styles.buttonRow}>
                                 <TouchableOpacity
-                                    style={[styles.editButton]}
+                                    style={styles.editButton}
                                     onPress={() => navigateToEdit(dateItem, item, index)}
                                 >
                                     <Text style={styles.buttonText}>Редактировать</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[styles.addnumberbutton]}
-                                    onPress={() => navigateToSelect(dateItem, item, index)}
-                                >
-                                    <Text style={styles.buttonText}>Добавить номера</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -149,6 +155,30 @@ const styles = StyleSheet.create({
     dateItem: {
         marginBottom: 10,
     },
+    machineryListContainer: {
+        marginTop: 10,
+    },
+    machineryItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    machineryNumber: {
+        fontSize: 16,
+    },
+    addNumberButton: {
+        backgroundColor: '#28a745',
+        padding: 8,
+        borderRadius: 5,
+        width: 150,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    separator: {
+        color: '#ccc',
+    },
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -158,18 +188,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#6c757d',
         padding: 8,
         borderRadius: 5,
-        marginRight: 5,
-        height: 40,
-        width: 150,
-        height: 40,
-        alignSelf: 'flex-start',
-    },
-    addnumberbutton: {
-        backgroundColor: '#28a745',
-        padding: 8,
-        borderRadius: 5,
-        flex: 1,
-        marginRight: 5,
         width: 150,
         height: 40,
         alignSelf: 'flex-start',
@@ -181,26 +199,10 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: 5,
     },
-    separator: {
-        color: '#ccc',
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 10,
-    },
-    actionButton: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        flex: 1,
-        marginRight: 5,
-    },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
-
     },
 });
 

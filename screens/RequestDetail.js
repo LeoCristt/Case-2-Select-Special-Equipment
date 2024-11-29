@@ -12,7 +12,7 @@ const RequestDetail = ({ route, navigation }) => {
 
     const addEquipment = () => {
         if ([type, quantity, plannedWorkTime, date].every(Boolean)) {
-            patchRequest({ id: request.id, date: date, type: type, quantity: quantity, plannedWorkTime: plannedWorkTime });
+            patchRequest({ id: request.id, date: date + ":00", type: type, quantity: quantity, plannedWorkTime: plannedWorkTime });
             console.log(`Добавлено новое оборудование: ${type}, Количество: ${quantity}, Время работы: ${plannedWorkTime}, Дата: ${date}`);
             setType('');
             setQuantity('');
