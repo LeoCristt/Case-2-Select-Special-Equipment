@@ -34,31 +34,29 @@ const RequestList = ({ navigation }) => {
         loadRequests();
     }, [subdivision]);
 
-    const navigateToDetail = (request) => {
-        navigation.navigate('RequestDetail', { request });
-    };
-
-    const navigateToEdit = (dateItem, item, index) => {
-        const request_id = item.id;
-        const dateItem_index = index;
-        navigation.navigate('EditRequest', { dateItem, request_id, dateItem_index }); 
-    };
-
     const navigateToSelect = (dateItem, item, dateItem_index, machinery_index) => {
         const request_id = item.id;
         navigation.navigate('SelectEquipment', { dateItem, request_id, dateItem_index, machinery_index }); 
     };
 
-    const handleSendRequests = async () => {
-        try {
-            const requestIds = requests.map(request => request.id);
-            await sendRequests(requestIds);
-            setRequests([]);
-            Alert.alert('Успех', 'Все заявки успешно отправлены!');
-        } catch (error) {
-            console.error('Ошибка при отправке заявок:', error);
-            Alert.alert('Ошибка', 'Не удалось отправить заявки.');
-        }
+    const handleRemoveNumber = (dateItem, machinery_index) => {
+        // Удаляем номер машины
+        const updatedMachinery = { ...dateItem };
+        updatedMachinery.machinery[machinery_index] = null;
+
+        setRequests((prevRequests) => {
+            return prevRequests.map((request) => {
+                if (request.date_type_quantity_plannedWorkTime_machinery.includes(dateItem)) {
+                    return {
+                        ...request,
+                        date_type_quantity_plannedWorkTime_machinery: request.date_type_quantity_plannedWorkTime_machinery.map((entry) =>
+                            entry === dateItem ? updatedMachinery : entry
+                        ),
+                    };
+                }
+                return request;
+            });
+        });
     };
 
     const renderRequestItem = ({ item }) => (
@@ -78,36 +76,38 @@ const RequestList = ({ navigation }) => {
                             <View style={styles.machineryListContainer}>
                                 {Array.from({ length: dateItem.quantity }).map((_, machinery_index) => (
                                     <View style={styles.machineryItem} key={machinery_index}>
-                                        <Text style={styles.machineryNumber}>Номер Машины {machinery_index + 1} {dateItem.machinery[machinery_index + 1]}</Text>
-                                        <TouchableOpacity
-                                            style={styles.addNumberButton}
-                                            onPress={() => navigateToSelect(dateItem, item, index, machinery_index + 1)}
-                                        >
-                                            <Text style={styles.buttonText}>Добавить номер</Text>
-                                        </TouchableOpacity>
+                                        <Text style={styles.machineryLabel}>
+                                            Номер машины {machinery_index + 1}:
+                                        </Text>
+                                        {dateItem.machinery[machinery_index] ? (
+                                            <View style={styles.machineryAssigned}>
+                                                <Text style={styles.machineryNumber}>
+                                                    {dateItem.machinery[machinery_index]}
+                                                </Text>
+                                                <TouchableOpacity
+                                                    style={styles.removeButton}
+                                                    onPress={() => handleRemoveNumber(dateItem, machinery_index)}
+                                                >
+                                                    <Text style={styles.buttonText}>✖</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        ) : (
+                                            <TouchableOpacity
+                                                style={styles.addNumberButton}
+                                                onPress={() =>
+                                                    navigateToSelect(dateItem, item, index, machinery_index)
+                                                }
+                                            >
+                                                <Text style={styles.buttonText}>Добавить номер</Text>
+                                            </TouchableOpacity>
+                                        )}
                                     </View>
                                 ))}
-                            </View>
-                            <View style={styles.buttonRow}>
-                                <TouchableOpacity
-                                    style={styles.editButton}
-                                    onPress={() => navigateToEdit(dateItem, item, index)}
-                                >
-                                    <Text style={styles.buttonText}>Редактировать</Text>
-                                </TouchableOpacity>
                             </View>
                         </View>
                     )}
                     keyExtractor={(dateItem, index) => index.toString()}
                 />
-            </View>
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigateToDetail(item)}
-                >
-                    <Text style={styles.buttonText}>Добавить новую технику</Text>
-                </TouchableOpacity>
             </View>
         </View>
     );
@@ -122,7 +122,18 @@ const RequestList = ({ navigation }) => {
             {requests.length > 0 && (
                 <Button
                     title="Отправить заявки"
-                    onPress={handleSendRequests}
+                    onPress={() => {
+                        const requestIds = requests.map((request) => request.id);
+                        sendRequests(requestIds)
+                            .then(() => {
+                                setRequests([]);
+                                Alert.alert('Успех', 'Все заявки успешно отправлены!');
+                            })
+                            .catch((error) => {
+                                console.error('Ошибка при отправке заявок:', error);
+                                Alert.alert('Ошибка', 'Не удалось отправить заявки.');
+                            });
+                    }}
                 />
             )}
         </View>
@@ -159,12 +170,29 @@ const styles = StyleSheet.create({
     },
     machineryItem: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 5,
     },
+    machineryLabel: {
+        fontSize: 16,
+        marginRight: 10,
+    },
+    machineryAssigned: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     machineryNumber: {
         fontSize: 16,
+        marginRight: 10,
+    },
+    removeButton: {
+        backgroundColor: '#dc3545',
+        padding: 8,
+        borderRadius: 5,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     addNumberButton: {
         backgroundColor: '#28a745',
@@ -177,26 +205,6 @@ const styles = StyleSheet.create({
     },
     separator: {
         color: '#ccc',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 10,
-    },
-    editButton: {
-        backgroundColor: '#6c757d',
-        padding: 8,
-        borderRadius: 5,
-        width: 150,
-        height: 40,
-        alignSelf: 'flex-start',
-    },
-    addButton: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        flex: 1,
-        marginHorizontal: 5,
     },
     buttonText: {
         color: '#fff',
