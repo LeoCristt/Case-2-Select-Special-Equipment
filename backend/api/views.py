@@ -1,10 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, serializers
 from .models import Request
-from .serializers import RequestSerializer, MachinerySerializer, WaybillSerializer
-from rest_framework.exceptions import NotFound
-from rest_framework import serializers
+from .serializers import RequestSerializer, MachinerySerializer, WaybillSerializer, SubdivisionSerializer, MasterSerializer
 from .models import CustomUser, Subdivision, Master, Machinery, Waybill, Facility
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -16,7 +14,7 @@ class RequestList(APIView):
             try:
                 subdivisionObj = Subdivision.objects.get(name=subdivision)
             except Subdivision.DoesNotExist:
-                return Response({"error": f"Subdivision with name {subdivision} not found."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": f"Подразделения с таким именем {subdivision} не существует."}, status=status.HTTP_404_NOT_FOUND)
         
             requests = Request.objects.filter(subdivision=subdivisionObj).exclude(processed_by_logistician=True).order_by('-id')
         else:
@@ -58,14 +56,14 @@ class RequestList(APIView):
         try:
             subdivision = Subdivision.objects.get(name=request.data['subdivision'])
         except Subdivision.DoesNotExist:
-            return Response({"error": f"Subdivision with name {request.data['subdivision']} not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Подразделения с таким именем {request.data['subdivision']} не существует."}, status=status.HTTP_404_NOT_FOUND)
         
-        data['subdivision'] = subdivision.name  # Передаем ID объекта
+        data['subdivision'] = subdivision.name
         
         try:
             master = Master.objects.get(name=request.data['master'])
         except Master.DoesNotExist:
-            return Response({"error": f"Master with name '{request.data['master']}' does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Мастера с таким именем '{request.data['master']}' не существует."}, status=status.HTTP_404_NOT_FOUND)
         
         data['master'] = master.name
 
@@ -80,7 +78,7 @@ class RequestList(APIView):
             # Получаем объект по первичному ключу (pk)
             request_instance = Request.objects.get(pk=pk)
         except Request.DoesNotExist:
-            return Response({"error": f"Request with id {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Заявки с таким айди {pk} не существует."}, status=status.HTTP_404_NOT_FOUND)
 
         # Получаем существующий JSON из поля date_type_quantity_plannedWorkTime
         existing_data = request_instance.date_type_quantity_plannedWorkTime_machinery or []
@@ -90,7 +88,7 @@ class RequestList(APIView):
         if not new_data or not isinstance(new_data, dict):
             request_instance.processed_by_logistician = True
             request_instance.save()
-            return Response({"success": "Обработано логистом."}, status=status.HTTP_200_OK)
+            return Response({"success": "Заявка обработана логистом."}, status=status.HTTP_200_OK)
 
         # Добавляем новый словарь в существующие данные
         if list_index == None:
@@ -100,13 +98,11 @@ class RequestList(APIView):
 
             if isinstance(existing_data[list_index].get("machinery"), dict) and isinstance(new_machinery, dict):
                 # Объединяем ключи/значения
-                # Обновить все поля, кроме machinery
                 current_machinery = existing_data[list_index].get("machinery", {})
                 existing_data[list_index].update(new_data)  # Обновить остальные поля
                 existing_data[list_index]["machinery"] = current_machinery  # Вернуть machinery на место
                 existing_data[list_index]["machinery"].update(new_machinery)
             else:
-                # Если это не словари, заменяем старые данные новыми
                 existing_data[list_index]["machinery"] = new_machinery
 
 
@@ -114,13 +110,13 @@ class RequestList(APIView):
         request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data
         request_instance.save()
 
-        return Response({"success": "Entry added successfully"}, status=status.HTTP_200_OK)
+        return Response({"success": "Заявка успешно отредактирована."}, status=status.HTTP_200_OK)
     
     def delete(self, request, pk=None, list_index=None, machinery_index=None):
         try:
             request_instance = Request.objects.get(pk=pk)
         except Request.DoesNotExist:
-            return Response({"error": f"Request with id {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Заявки с таким айди {pk} не существует."}, status=status.HTTP_404_NOT_FOUND)
 
         existing_data = request_instance.date_type_quantity_plannedWorkTime_machinery or []
         
@@ -128,36 +124,39 @@ class RequestList(APIView):
             # Удаляем элемент
             existing_data[list_index]["machinery"].pop(f"{machinery_index}")
         except (IndexError, KeyError):
-            return Response({"error": "Invalid index provided."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Задан не существующий индекс."}, status=status.HTTP_400_BAD_REQUEST)
 
         request_instance.date_type_quantity_plannedWorkTime_machinery = existing_data
         request_instance.save()
 
-        return Response({"success": "Успешно удалено."}, status=status.HTTP_200_OK)
+        return Response({"success": "Заявка успешно удалена."}, status=status.HTTP_200_OK)
 
 
 class SubdivisionList(APIView):
     def get(self, request):
-        requests = Subdivision.objects.all()
-        serializer = RequestSerializer(requests, many=True)
+        subdivisions = Subdivision.objects.all()
+        serializer = SubdivisionSerializer(subdivisions, many=True)
         return Response(serializer.data)
     
 class MasterList(APIView):
     def get(self, request):
-        requests = Master.objects.all()
-        serializer = RequestSerializer(requests, many=True)
+        masters = Master.objects.all()
+        serializer = MasterSerializer(masters, many=True)
         return Response(serializer.data)
 
 class MachineryList(APIView):
     def get(self, request):
         busy_machineries = Waybill.objects.filter(closed=False).values_list('machinery', flat=True)
-        requests = Machinery.objects.all().exclude(license_plate__in=busy_machineries)
-        serializer = MachinerySerializer(requests, many=True)
+        machineries = Machinery.objects.all().exclude(license_plate__in=busy_machineries)
+        serializer = MachinerySerializer(machineries, many=True)
         return Response(serializer.data)
     
 class WaybillList(APIView):
-    def get(self, request):
-        waybills = Waybill.objects.all().filter(closed=False)
+    def get(self, request, subdivision=None):
+        if subdivision == None:
+            waybills = Waybill.objects.all().filter(closed=False)
+        else:
+            waybills = Waybill.objects.all().filter(closed=True, machinery__subdivision__name=f'{subdivision}')
         serializer = WaybillSerializer(waybills, many=True)
         return Response(serializer.data)
 
@@ -167,14 +166,14 @@ class WaybillList(APIView):
         try:
             machinery = Machinery.objects.get(license_plate=request.data['machinery'])
         except Machinery.DoesNotExist:
-            return Response({"error": f"Machinery with license plate {request.data['machinery']} not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Машины с таким номером {request.data['machinery']} не существует."}, status=status.HTTP_404_NOT_FOUND)
         
         data['machinery'] = machinery.license_plate
         
         try:
             facility = Facility.objects.get(name=request.data['facility'])
         except Facility.DoesNotExist:
-            return Response({"error": f"Facility with name '{request.data['facility']}' does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Объекта с таким именем '{request.data['facility']}' не существует."}, status=status.HTTP_404_NOT_FOUND)
         
         data['facility'] = facility.name
 
@@ -234,7 +233,7 @@ class WaybillList(APIView):
             # Получаем объект по первичному ключу (pk)
             waybill_instance = Waybill.objects.get(pk=pk)
         except Request.DoesNotExist:
-            return Response({"error": f"Waybill with id {pk} not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Путевого листа с таким айди {pk} не существует."}, status=status.HTTP_404_NOT_FOUND)
         
         waybill_instance.actual_time_of_departure = request.data['actual_time_of_departure']
         waybill_instance.actual_time_of_arrival_at_the_facility = request.data['actual_time_of_arrival_at_the_facility']
@@ -242,7 +241,8 @@ class WaybillList(APIView):
         waybill_instance.actual_time_of_waiting_at_the_facility = request.data['actual_time_of_waiting_at_the_facility']
         waybill_instance.closed = True
         waybill_instance.save()
-        return Response({"success": "Успешно изменено."}, status=status.HTTP_200_OK)
+
+        return Response({"success": "Путевой илст успешно изменен."}, status=status.HTTP_200_OK)
 
 
 # Создаем новый сериализатор для получения токенов с дополнительными данными

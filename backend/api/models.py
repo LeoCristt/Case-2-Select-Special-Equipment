@@ -22,6 +22,7 @@ class Machinery(models.Model):
     technical_passport = models.JSONField()
     driver = models.OneToOneField(Driver, on_delete=models.CASCADE)
     subdivision = models.ForeignKey(Subdivision, on_delete=models.SET_NULL, null=True)
+    money_consumption_per_hour = models.PositiveIntegerField()
 
     def __str__(self):
         return self.license_plate

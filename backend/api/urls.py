@@ -20,4 +20,5 @@ urlpatterns = [
 
     path('waybill/', WaybillList.as_view(), name='waybill-list'),
     path('waybill/<int:pk>/', WaybillList.as_view(), name='waybill-edit'),
+    path('waybill/<str:subdivision>/', WaybillList.as_view(), name='waybill-list_subdivision'),
 ]
