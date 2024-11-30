@@ -40,6 +40,16 @@ export const fetchRouteSheets = async () => {
     }
 };
 
+export const fetchRouteSheets_subdivision = async (subdivision) => {
+    try {
+        const response = await apiClient.get(`/waybill/${subdivision}/`);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при получении путевых листов:', error);
+        throw error;
+    }
+};
+
 export const deleteMachinery_fromRequest = async (request_id, dateItem_index, machinery_index) => {
     try {
         const response = await apiClient.delete(`/request/${request_id}/${dateItem_index}/${machinery_index}/`);
