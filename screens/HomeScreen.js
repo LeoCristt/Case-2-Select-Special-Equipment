@@ -43,6 +43,14 @@ const HomeScreen = ({ navigation }) => {
                             <Text style={styles.buttonText}>Путевые листы</Text>
                         </TouchableOpacity>
                     )}
+                    {(decodedToken.role === "subdivision_manager" || decodedToken.role === "admin") && (
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => navigation.navigate('Analitik')}
+                        >
+                            <Text style={styles.buttonText}>Аналитика</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         </View>
